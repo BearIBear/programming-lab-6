@@ -1,0 +1,262 @@
+@startuml
+skinparam linetype ortho
+
+package models {
+  enum Color {
+    RED
+    BLACK
+    BLUE
+    YELLOW
+    BROWN
+  }
+
+  class Coordinates {
+    - x: Long
+    - y: float
+    + Coordinates(x: Long, y: float)
+    + getX(): Long
+    + getY(): float
+    + toString(): String
+  }
+
+  interface "Comparable<MusicBand>" as Comparable
+
+  class MusicBand implements Comparable {
+    - id: long
+    - name: String
+    - coordinates: Coordinates
+    - creationDate: java.util.Date
+    - numberOfParticipants: long
+    - singlesCount: long
+    - description: String
+    - genre: MusicGenre
+    - frontMan: Person
+    - {static} nextId: long
+    - {static} vacantIds: ArrayList<Long>
+    + MusicBand(name: String, coordinates: Coordinates, numberOfParticipants: long, singlesCount: long, description: String, genre: MusicGenre, frontMan: Person)
+    + getId(): long
+    + getName(): String
+    + getCoordinates(): Coordinates
+    + getCreationDate(): java.util.Date
+    + getNumberOfParticipants(): long
+    + getSinglesCount(): long
+    + getDescription(): String
+    + getGenre(): MusicGenre
+    + getFrontMan(): Person
+    + toString(): String
+    + compareTo(other: MusicBand): int
+    + {static} setNextId(nextId: long): void
+    + {static} getVacantIds(): ArrayList<Long>
+    + {static} setVacantIds(vacantIds: ArrayList<Long>): void
+    + {static} addVacantId(vacantId: Long): void
+    + {static} getNextId(): long
+    + setId(id: long): void
+  }
+
+  enum MusicGenre {
+    PSYCHEDELIC_ROCK
+    POP
+    MATH_ROCK
+    PUNK_ROCK
+    - name: String
+    - MusicGenre(name: String)
+    + toString(): String
+  }
+
+  class Person {
+    - name: String
+    - birthday: java.time.LocalDate
+    - eyeColor: Color
+    + Person(name: String, birthday: LocalDate, eyeColor: Color)
+    + getName(): String
+    + getBirthday(): java.time.LocalDate
+    + getEyeColor(): Color
+    + toString(): String
+  }
+}
+
+package managers {
+  interface "TypeAdapter<LocalDate>" as TypeAdapter
+
+  class CollectionManager {
+    - collection: PriorityQueue<MusicBand>
+    - initTime: LocalDateTime
+    + CollectionManager()
+    + getCollection(): PriorityQueue<MusicBand>
+    + getInitTime(): LocalDateTime
+    + addElement(band: MusicBand): void
+    + clearCollection(): void
+    + removeElement(id: long): boolean
+  }
+
+  class CommandManager {
+    - commandsList: Map<String, Command>
+    - scriptFiles: ArrayList<File>
+    - recursionLimit: int
+    - recursionForcedExit: boolean
+    + CommandManager()
+    + register(command: Command): void
+    + getCommandsList(): Map<String, Command>
+    + getScriptFiles(): ArrayList<File>
+    + addScriptFile(file: File): void
+    + clearScriptFile(): void
+    + checkRecursionExhaustion(file: File): boolean
+    + getRecursionLimit(): int
+    + isRecursionForcedExit(): boolean
+    + setRecursionForcedExit(recursionForcedExit: boolean): void
+  }
+
+  class ConsoleManager {
+    - terminal: Terminal
+    - reader: LineReader
+    + ConsoleManager(terminal: Terminal, reader: LineReader)
+    + ConsoleManager(terminal: Terminal)
+    + getTerminal(): Terminal
+    + getReader(): LineReader
+    + askName(): String
+    + askX(): Long
+    + askY(): float
+    + askCoordinates(): Coordinates
+    + askNumberOfParticipants(): long
+    + askSinglesCount(): long
+    + askDescription(): String
+    + askMusicGenre(): MusicGenre
+    + askPersonName(): String
+    + askBirthday(): LocalDate
+    + askColor(): Color
+    + askFrontMan(): Person
+    + askMusicBand(): MusicBand
+    + setTerminal(terminal: Terminal): void
+    + setReader(reader: LineReader): void
+  }
+
+  class FileManager {
+    - fileName: String
+    - gson: Gson
+    + FileManager(fileName: String)
+    + load(collectionManager: CollectionManager): void
+    + save(collectionManager: CollectionManager): void
+  }
+
+  class LocalDateAdapter extends TypeAdapter {
+    + write(jsonWriter: JsonWriter, localDate: LocalDate): void
+    + read(jsonReader: JsonReader): LocalDate
+  }
+  
+  FileManager +-- LocalDateAdapter
+
+  class InputManager {
+    - scanner: Scanner
+    + InputManager(scanner: Scanner)
+    + askName(): String
+    + askX(): Long
+    + askY(): float
+    + askCoordinates(): Coordinates
+    + askNumberOfParticipants(): long
+    + askSinglesCount(): long
+    + askDescription(): String
+    + askMusicGenre(): MusicGenre
+    + askPersonName(): String
+    + askBirthday(): LocalDate
+    + askColor(): Color
+    + askFrontMan(): Person
+    + askMusicBand(): MusicBand
+  }
+}
+
+package commands {
+  abstract class Command {
+    # name: String
+    - desc: String
+    - argsAmount: int
+    # commandManager: CommandManager
+    # collectionManager: CollectionManager
+    # consoleManager: ConsoleManager
+    + Command(name: String, desc: String, argsAmount: int, collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + {abstract} run(args: String[]): boolean
+    + getName(): String
+    + getDesc(): String
+    + getCommandManager(): CommandManager
+    + getCollectionManager(): CollectionManager
+    + setCommandManager(commandManager: CommandManager): void
+    + checkArgAmount(args: String[]): boolean
+    + {static} RemoveEmptyElements(input: String[]): String[]
+  }
+
+  class Add extends Command {
+    + Add(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class AddIfMax extends Command {
+    + AddIfMax(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class AddIfMin extends Command {
+    + AddIfMin(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Clear extends Command {
+    + Clear(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class CountLessThanDescription extends Command {
+    + CountLessThanDescription(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Exit extends Command {
+    + Exit(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class FilterContainsName extends Command {
+    + FilterContainsName(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class FilterGreaterThanGenre extends Command {
+    + FilterGreaterThanGenre(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Head extends Command {
+    + Head(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Help extends Command {
+    + Help(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Info extends Command {
+    + Info(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class RemoveById extends Command {
+    + RemoveById(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Save extends Command {
+    - fileManager: FileManager
+    + Save(collectionManager: CollectionManager, consoleManager: ConsoleManager, fileManager: FileManager)
+    + run(args: String[]): boolean
+  }
+  class Script extends Command {
+    + Script(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Show extends Command {
+    + Show(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+  class Update extends Command {
+    + Update(collectionManager: CollectionManager, consoleManager: ConsoleManager)
+    + run(args: String[]): boolean
+  }
+}
+
+class Main {
+  + {static} main(args: String[]): void
+}
+
+MusicBand *-- Coordinates
+MusicBand *-- MusicGenre
+MusicBand *-- Person
+Person *-- Color
+
+@enduml

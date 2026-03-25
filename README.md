@@ -1,2 +1,2 @@
-# programming-lab-6
-UDP-protocol based server ran commands
+# programming-lab-5
+Collection management through console commands 

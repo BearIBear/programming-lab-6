@@ -1,0 +1,2 @@
+Main-Class: Main
+Class-Path: lib/gson-2.13.2.jar lib/jansi-2.4.2.jar lib/jline-3.30.7.jar

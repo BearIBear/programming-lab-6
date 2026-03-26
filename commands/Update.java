@@ -3,10 +3,8 @@ package commands;
 import managers.ConsoleManager;
 
 import java.util.PriorityQueue;
-import java.util.Scanner;
 
 import managers.CollectionManager;
-import managers.InputManager;
 import models.MusicBand;
 
 /**
@@ -30,7 +28,7 @@ public class Update extends Command {
         for (MusicBand musicBand : musicBands) {
             if (musicBand.getId() == id) {
                 collectionManager.removeElement(id);
-                MusicBand bandToInsert = new InputManager(new Scanner(System.in, System.getProperty("sun.stdout.encoding", "UTF-8"))).askMusicBand();
+                MusicBand bandToInsert = consoleManager.askMusicBand();
                 bandToInsert.setId(id);
                 collectionManager.addElement(bandToInsert);
                 return true;

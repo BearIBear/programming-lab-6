@@ -1,11 +1,11 @@
-package managers;
+package server.managers;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import commands.Command;
+import server.commands.Command;
 
 /**
  * Менеджер для регистрации и исполнения команд

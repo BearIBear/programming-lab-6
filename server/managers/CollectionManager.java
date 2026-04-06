@@ -1,7 +1,9 @@
-package managers;
+package server.managers;
+
+import java.util.PriorityQueue;
 
 import models.MusicBand;
-import java.util.PriorityQueue;
+
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +12,7 @@ import java.time.LocalDateTime;
  * @author Михаил
  */
 public class CollectionManager {
-    private PriorityQueue<MusicBand> collection;
+    private PriorityQueue<MusicBand> collection; // TODO: Сделать так, чтобы nextId у банд был только в CollectionManager, а не в MusicBand
     private LocalDateTime initTime;
 
     public CollectionManager() {

@@ -1,11 +1,10 @@
-package commands;
-
-import managers.ConsoleManager;
+package server.commands;
 
 import java.util.Arrays;
 
-import managers.CollectionManager;
+import client.managers.ConsoleManager;
 import models.MusicBand;
+import server.managers.CollectionManager;
 
 /**
  * Команда для вывода количества элементов, значение поля description которых меньше заданного

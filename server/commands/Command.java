@@ -1,12 +1,11 @@
-package commands;
-
-import managers.ConsoleManager;
+package server.commands;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-import managers.CollectionManager;
-import managers.CommandManager;
+import client.managers.ConsoleManager;
+import server.managers.CollectionManager;
+import server.managers.CommandManager;
 
 /**
  * Абстрактный базовый класс для всех команд
@@ -19,7 +18,7 @@ public abstract class Command {
     private final int argsAmount;
     protected CommandManager commandManager;
     protected CollectionManager collectionManager;
-    protected ConsoleManager consoleManager;
+    protected ConsoleManager consoleManager; // TODO: Убрать отсюда consoleManager
 
     public Command(String name, String desc, int argsAmount, CollectionManager collectionManager, ConsoleManager consoleManager) {
         this.name = name;
@@ -29,7 +28,8 @@ public abstract class Command {
         this.consoleManager = consoleManager;
     }
 
-    public abstract boolean run(String[] args);
+    public abstract boolean run(String[] args); // TODO: Добавить ещё в аргументы сюда MusicBand band, который может быть null
+    // TODO: boolean заменить на кастомный класс, содержащий: stopFlag (состояние работы программы), message (сообщение, привязанное к состоянию)
     
     public String getName() {
         return name;

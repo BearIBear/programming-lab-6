@@ -1,9 +1,8 @@
-package commands;
+package server.commands;
 
-import managers.ConsoleManager;
-
-import managers.CollectionManager;
+import client.managers.ConsoleManager;
 import models.MusicBand;
+import server.managers.CollectionManager;
 
 /**
  * Команда для удаления элемента из коллекции по его id
@@ -24,7 +23,8 @@ public class RemoveById extends Command {
         try {
             long id = Long.parseLong(args[1]);
             if (collectionManager.removeElement(id)) {
-                consoleManager.getTerminal().writer().println("Элемент с id = " + id + " успешно удалён");
+                consoleManager.getTerminal().writer().println("Элемент с id = " + id + " успешно удалён"); // TODO: подобные вещи необходимо заменить на: result.setFeedback("...")
+                // result = класс execResult
                 MusicBand.addVacantId(id);
             } else {
                 consoleManager.getTerminal().writer().println("\u001B[31m" + this.name + " : Элемент с id = " + id + " не найден" + "\u001B[0m");

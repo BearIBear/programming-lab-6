@@ -1,11 +1,10 @@
-package commands;
-
-import managers.ConsoleManager;
+package server.commands;
 
 import java.util.Arrays;
 
-import managers.CollectionManager;
+import client.managers.ConsoleManager;
 import models.MusicBand;
+import server.managers.CollectionManager;
 
 /**
  * Команда для вывода элементов, значение поля name которых содержит заданную подстроку

@@ -1,13 +1,12 @@
-package commands;
-
-import managers.ConsoleManager;
+package server.commands;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.Scanner;
 
-import managers.CollectionManager;
+import client.managers.ConsoleManager;
+import server.managers.CollectionManager;
 
 /**
  * Команда для считывания и исполнения скрипта из указанного файла с контролем рекурсии

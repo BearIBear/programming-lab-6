@@ -1,4 +1,4 @@
-package managers;
+package client.managers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

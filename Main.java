@@ -19,10 +19,13 @@ import org.jline.terminal.TerminalBuilder;
 import org.jline.utils.AttributedString;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
+
+import client.managers.ConsoleManager;
+
 import org.jline.builtins.Completers.FileNameCompleter;
 
-import commands.*;
-import managers.*;
+import server.commands.*;
+import server.managers.*;
 
 /**
  * Главный класс приложения, содержащий точку входа и инициализацию компонентов JLine и команд
@@ -152,7 +155,7 @@ class Main {
                 }
             };
             
-            var dynamicCompleter = new AggregateCompleter(new StringsCompleter(commandsList.keySet()), new FileNameCompleter());
+            AggregateCompleter dynamicCompleter = new AggregateCompleter(new StringsCompleter(commandsList.keySet()), new FileNameCompleter());
             LineReader reader = LineReaderBuilder.builder()
                     .terminal(terminal)
                     .completer(dynamicCompleter)
@@ -162,6 +165,9 @@ class Main {
                     .build();
             consoleManager.setReader(reader);
 
+            // TODO: Разделить данный луп на:
+            // 1. Клиентский, который просто считывает/проверяет данные, а потом печатает ответ сервера
+            // 2. Серверный (Вынести в отдельный файл), который просто получает данные от данного лупа и что-то с ними делает
             boolean state = true;
             while (state) {
                 String input = reader.readLine("> ");

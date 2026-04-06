@@ -1,8 +1,7 @@
-package commands;
+package server.commands;
 
-import managers.ConsoleManager;
-
-import managers.CollectionManager;
+import client.managers.ConsoleManager;
+import server.managers.CollectionManager;
 
 /**
  * Команда для завершения работы программы (без сохранения в файл)

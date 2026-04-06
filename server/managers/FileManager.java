@@ -1,4 +1,4 @@
-package managers;
+package server.managers;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;

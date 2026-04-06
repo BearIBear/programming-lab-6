@@ -1,9 +1,8 @@
-package commands;
+package server.commands;
 
-import managers.ConsoleManager;
-
-import managers.CollectionManager;
-import managers.FileManager;
+import client.managers.ConsoleManager;
+import server.managers.CollectionManager;
+import server.managers.FileManager;
 
 /**
  * Команда для сохранения коллекции в файл

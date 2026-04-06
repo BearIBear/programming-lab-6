@@ -1,9 +1,8 @@
-package commands;
+package server.commands;
 
-import managers.ConsoleManager;
-
-import managers.CollectionManager;
+import client.managers.ConsoleManager;
 import models.MusicBand;
+import server.managers.CollectionManager;
 
 /**
  * Команда для очистки коллекции

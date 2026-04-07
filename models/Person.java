@@ -1,4 +1,5 @@
 package models;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 /**
@@ -6,7 +7,7 @@ import java.time.LocalDate;
  *
  * @author Михаил
  */
-public class Person {
+public class Person implements Serializable {
     private String name; //Поле не может быть null, Строка не может быть пустой
     private java.time.LocalDate birthday; //Поле может быть null
     private Color eyeColor; //Поле может быть null

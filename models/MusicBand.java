@@ -1,4 +1,5 @@
 package models;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,7 +9,7 @@ import java.util.Date;
  *
  * @author Михаил
  */
-public class MusicBand implements Comparable<MusicBand> {
+public class MusicBand implements Comparable<MusicBand>, Serializable {
     private long id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
@@ -128,5 +129,13 @@ public class MusicBand implements Comparable<MusicBand> {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void fixId() {
+        if (vacantIds.isEmpty()) {
+            this.id = nextId++;
+        } else {
+            this.id = vacantIds.remove(0);
+        }
     }
 }

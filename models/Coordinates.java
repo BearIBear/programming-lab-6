@@ -1,11 +1,13 @@
 package models;
 
+import java.io.Serializable;
+
 /**
  * Класс, представляющий координаты (x, y)
  *
  * @author Михаил
  */
-public class Coordinates {
+public class Coordinates implements Serializable {
     private Long x; //Максимальное значение поля: 432, Поле не может быть null
     private float y;
 

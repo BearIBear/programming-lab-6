@@ -2,7 +2,7 @@ package server.commands;
 
 import java.util.PriorityQueue;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -12,8 +12,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Update extends Command {
-    public Update(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("update", "обновить значение элемента коллекции, id которого равен заданному", 1, collectionManager, consoleManager);
+    public Update(CollectionManager collectionManager) {
+        super("update", "обновить значение элемента коллекции, id которого равен заданному", 1, collectionManager);
     }
 
     @Override

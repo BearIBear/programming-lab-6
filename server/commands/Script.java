@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.Map;
 import java.util.Scanner;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 
 /**
@@ -14,8 +14,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Script extends Command {
-    public Script(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("script", "считать и исполнить скрипт из указанного файла", 1, collectionManager, consoleManager);
+    public Script(CollectionManager collectionManager) {
+        super("script", "считать и исполнить скрипт из указанного файла", 1, collectionManager);
     }
 
     @Override

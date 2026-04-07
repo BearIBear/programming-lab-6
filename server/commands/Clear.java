@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -10,8 +10,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Clear extends Command {
-    public Clear(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("clear", "очистить коллекцию", 0, collectionManager, consoleManager);
+    public Clear(CollectionManager collectionManager) {
+        super("clear", "очистить коллекцию", 0, collectionManager);
     }
 
     @Override

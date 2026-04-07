@@ -2,7 +2,7 @@ package server.commands;
 
 import java.util.Arrays;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -12,8 +12,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class CountLessThanDescription extends Command {
-    public CountLessThanDescription(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("count_less_than_description", "вывести количество элементов, значение поля description которых меньше заданного", 1, collectionManager, consoleManager);
+    public CountLessThanDescription(CollectionManager collectionManager) {
+        super("count_less_than_description", "вывести количество элементов, значение поля description которых меньше заданного", 1, collectionManager);
     }
 
     @Override

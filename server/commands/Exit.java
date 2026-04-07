@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 
 /**
@@ -9,8 +9,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Exit extends Command {
-    public Exit(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("exit", "завершить программу (без сохранения в файл)", 0, collectionManager, consoleManager);
+    public Exit(CollectionManager collectionManager) {
+        super("exit", "завершить программу (без сохранения в файл)", 0, collectionManager);
     }
 
     @Override

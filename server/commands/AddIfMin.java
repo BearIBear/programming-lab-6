@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -10,8 +10,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class AddIfMin extends Command {
-    public AddIfMin(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("add_if_min", "добавить новый элемент в коллекцию, если его значение превышает значение наибольшего элемента этой коллекции", 0, collectionManager, consoleManager);
+    public AddIfMin(CollectionManager collectionManager) {
+        super("add_if_min", "добавить новый элемент в коллекцию, если его значение превышает значение наибольшего элемента этой коллекции", 0, collectionManager);
     }
 
     @Override

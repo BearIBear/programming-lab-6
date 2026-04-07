@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -10,8 +10,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class RemoveById extends Command {
-    public RemoveById(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("remove_by_id", "удалить элемент из коллекции по его id", 1, collectionManager, consoleManager);
+    public RemoveById(CollectionManager collectionManager) {
+        super("remove_by_id", "удалить элемент из коллекции по его id", 1, collectionManager);
     }
 
     @Override

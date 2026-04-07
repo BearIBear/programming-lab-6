@@ -4,7 +4,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +26,7 @@ import org.jline.utils.AttributedStyle;
 import client.managers.ConsoleManager;
 
 import org.jline.builtins.Completers.FileNameCompleter;
-
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationUtils;
 
 /**
@@ -43,10 +45,19 @@ class MainClient {
 
                 ConsoleManager consoleManager = new ConsoleManager(terminal);
 
+                System.out.println("Клиент запущен, пытаемся передать UUID");
                 byte[] serializedClientUUID = SerializationUtils.serialize(clientId);
                 DatagramPacket sendPacket = new DatagramPacket(serializedClientUUID, serializedClientUUID.length, InetAddress.getLocalHost(), 3553);
+                clientSocket.send(sendPacket);
+                System.out.println("UUID отправлен успешно");
 
-                String[] commandNames = {}; //TODO: Сделать так, чтобы при первом подключении сервер отправлял клиенту список команд
+                byte[] receiveBuffer = new byte[4096];
+                DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                clientSocket.receive(receivePacket);
+                String[] commandNames = SerializationUtils.deserialize(receiveBuffer);
+                System.out.println("Имена команд получены успешно");
+
+                // String[] commandNames = {}; //TODO: Сделать так, чтобы при первом подключении сервер отправлял клиенту список команд
                 // СПИСОК КОМАНД ДОЛЖЕН БЫТЬ ОТСОРТИРОВАН!!!
                 String commands = "\\b(" + String.join("|", commandNames) + ")\\b";
                 final Pattern commandsPattern = Pattern.compile(commands, Pattern.CASE_INSENSITIVE);
@@ -59,7 +70,12 @@ class MainClient {
                 //     pathStream.close();
                 // } catch (IOException e) {}
 
-                String[] filesRaw = {};
+                receiveBuffer = new byte[4096];
+                receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                clientSocket.receive(receivePacket);
+                String[] filesRaw = SerializationUtils.deserialize(receiveBuffer);
+                System.out.println("Имена файлов получены успешно");
+
                 String files = String.join("|", filesRaw);
                 files = files.replace(".", "\\.");
                 files = files.replace("(", "\\(");
@@ -157,5 +173,16 @@ class MainClient {
         } catch (SocketException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<byte[]> packBytes(byte[] serializedUUID, byte[] serializedObject) {
+        int free_space = 4096 - 80 * 2;
+        List<byte[]> result = new ArrayList<>();
+        int parts = (int) Math.ceil((double) serializedObject.length / free_space);
+        for (int i = 0; i < parts; i++) {
+            byte[] part = Arrays.copyOfRange(serializedObject, i * free_space, (i + 1) * free_space > serializedObject.length ? serializedObject.length : (i + 1) * free_space);
+            result.add(ArrayUtils.addAll(serializedUUID, ArrayUtils.addAll(part, serializedUUID)));
+        }
+        return result;
     }
 }

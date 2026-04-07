@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 
 /**
@@ -9,8 +9,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Help extends Command {
-    public Help(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("help", "вывести справку по доступным командам", 0, collectionManager, consoleManager);
+    public Help(CollectionManager collectionManager) {
+        super("help", "вывести справку по доступным командам", 0, collectionManager);
     }
 
     @Override

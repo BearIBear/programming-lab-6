@@ -2,7 +2,7 @@ package server.commands;
 
 import java.util.Arrays;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -12,8 +12,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class FilterGreaterThanGenre extends Command {
-    public FilterGreaterThanGenre(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("filter_greater_than_genre", "вывести элементы, значение поля genre которых больше заданного", 1, collectionManager, consoleManager);
+    public FilterGreaterThanGenre(CollectionManager collectionManager) {
+        super("filter_greater_than_genre", "вывести элементы, значение поля genre которых больше заданного", 1, collectionManager);
     }
 
     @Override

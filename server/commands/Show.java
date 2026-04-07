@@ -2,7 +2,7 @@ package server.commands;
 
 import java.util.PriorityQueue;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -12,8 +12,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Show extends Command {
-    public Show(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("show", "вывести в стандартный поток вывода все элементы коллекции в строковом представлении", 0, collectionManager, consoleManager);
+    public Show(CollectionManager collectionManager) {
+        super("show", "вывести в стандартный поток вывода все элементы коллекции в строковом представлении", 0, collectionManager);
     }
 
     @Override

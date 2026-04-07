@@ -2,7 +2,7 @@ package server.commands;
 
 import java.util.Arrays;
 
-import client.managers.ConsoleManager;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
 
@@ -12,8 +12,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class FilterContainsName extends Command {
-    public FilterContainsName(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("filter_contains_name", "вывести элементы, значение поля name которых содержит заданную подстроку", 1, collectionManager, consoleManager);
+    public FilterContainsName(CollectionManager collectionManager) {
+        super("filter_contains_name", "вывести элементы, значение поля name которых содержит заданную подстроку", 1, collectionManager);
     }
 
     @Override

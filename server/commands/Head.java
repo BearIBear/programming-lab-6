@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 
 /**
@@ -9,8 +9,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Head extends Command {
-    public Head(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("head", "вывести первый элемент коллекции", 0, collectionManager, consoleManager);
+    public Head(CollectionManager collectionManager) {
+        super("head", "вывести первый элемент коллекции", 0, collectionManager);
     }
 
     @Override

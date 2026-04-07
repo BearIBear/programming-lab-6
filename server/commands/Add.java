@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 
 /**
@@ -9,8 +9,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Add extends Command {
-    public Add(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("add", "добавить новый элемент в коллекцию", 0, collectionManager, consoleManager);
+    public Add(CollectionManager collectionManager) {
+        super("add", "добавить новый элемент в коллекцию", 0, collectionManager);
     }
 
     @Override

@@ -3,7 +3,7 @@ package server.commands;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 import server.managers.CommandManager;
 
@@ -18,14 +18,12 @@ public abstract class Command {
     private final int argsAmount;
     protected CommandManager commandManager;
     protected CollectionManager collectionManager;
-    protected ConsoleManager consoleManager; // TODO: Убрать отсюда consoleManager
 
-    public Command(String name, String desc, int argsAmount, CollectionManager collectionManager, ConsoleManager consoleManager) {
+    public Command(String name, String desc, int argsAmount, CollectionManager collectionManager) {
         this.name = name;
         this.desc = desc;
         this.argsAmount = argsAmount + 1;
         this.collectionManager = collectionManager;
-        this.consoleManager = consoleManager;
     }
 
     public abstract boolean run(String[] args); // TODO: Добавить ещё в аргументы сюда MusicBand band, который может быть null

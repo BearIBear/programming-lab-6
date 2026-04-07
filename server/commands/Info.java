@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 
 /**
@@ -9,8 +9,8 @@ import server.managers.CollectionManager;
  * @author Михаил
  */
 public class Info extends Command {
-    public Info(CollectionManager collectionManager, ConsoleManager consoleManager) {
-        super("info", "вывести информацию о коллекции", 0, collectionManager, consoleManager);
+    public Info(CollectionManager collectionManager) {
+        super("info", "вывести информацию о коллекции", 0, collectionManager);
     }
 
     @Override

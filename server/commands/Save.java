@@ -1,6 +1,6 @@
 package server.commands;
 
-import client.managers.ConsoleManager;
+
 import server.managers.CollectionManager;
 import server.managers.FileManager;
 
@@ -12,8 +12,8 @@ import server.managers.FileManager;
 public class Save extends Command {
     private FileManager fileManager;
 
-    public Save(CollectionManager collectionManager, ConsoleManager consoleManager, FileManager fileManager) {
-        super("save", "сохранить коллекцию в файл", 0, collectionManager, consoleManager);
+    public Save(CollectionManager collectionManager, FileManager fileManager) {
+        super("save", "сохранить коллекцию в файл", 0, collectionManager);
         this.fileManager = fileManager;
     }
 

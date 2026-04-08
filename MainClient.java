@@ -3,6 +3,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.jline.reader.Highlighter;
 import org.jline.reader.History;
 import org.jline.reader.LineReader;
@@ -24,6 +26,7 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
 import client.managers.ConsoleManager;
+import util.Packet;
 
 import org.jline.builtins.Completers.FileNameCompleter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -35,40 +38,47 @@ import org.apache.commons.lang3.SerializationUtils;
  * @author Михаил
  */
 class MainClient {
-    private final static UUID clientId = UUID.randomUUID();
-
     public static void main(String[] args) {
+        UUID clientUUID = UUID.randomUUID();
+        // d2c785a1-e155-4469-89b6-f7594d7774eb
+        System.out.println("UUID Клиента: " + clientUUID);
         try (DatagramSocket clientSocket = new DatagramSocket()) { // TODO: Сервер пусть будет на 3553
             try {
+                clientSocket.setSoTimeout(5000);
                 Terminal terminal = TerminalBuilder.builder().system(true).build();
                 History history = new DefaultHistory();
 
                 ConsoleManager consoleManager = new ConsoleManager(terminal);
 
                 System.out.println("Клиент запущен, пытаемся передать UUID");
-                byte[] serializedClientUUID = SerializationUtils.serialize(clientId);
-                DatagramPacket sendPacket = new DatagramPacket(serializedClientUUID, serializedClientUUID.length, InetAddress.getLocalHost(), 3553);
-                clientSocket.send(sendPacket);
+                Packet sendPacket = new Packet(clientUUID, 1, 0, null);
+                byte[] serializedPacket = SerializationUtils.serialize(sendPacket);
+                DatagramPacket sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, InetAddress.getLocalHost(), 3553);
+                clientSocket.send(sendDatagramPacket);
                 System.out.println("UUID отправлен успешно");
 
-                byte[] receiveBuffer = new byte[4096];
+                byte[] receiveBuffer = new byte[1024];
                 DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                clientSocket.receive(receivePacket);
+                
+                for (int i = 0;; i++) {
+                    try {
+                        if (i > 0) {
+                            System.out.println("Попытка переподключения: " + i);
+                            clientSocket.send(sendDatagramPacket);
+                        }
+                        clientSocket.receive(receivePacket);
+                        break;
+                    } catch (SocketTimeoutException e) {
+                        System.out.println("Получение команд провалилось...");
+                    }
+                }
+                
                 String[] commandNames = SerializationUtils.deserialize(receiveBuffer);
                 System.out.println("Имена команд получены успешно");
 
-                // String[] commandNames = {}; //TODO: Сделать так, чтобы при первом подключении сервер отправлял клиенту список команд
-                // СПИСОК КОМАНД ДОЛЖЕН БЫТЬ ОТСОРТИРОВАН!!!
-                String commands = "\\b(" + String.join("|", commandNames) + ")\\b";
+                String commands = "\\b(" + String.join("|", commandNames) + "|" + "exit" + ")\\b";
                 final Pattern commandsPattern = Pattern.compile(commands, Pattern.CASE_INSENSITIVE);
-
-                //TODO: Сделать так, чтобы при первом подключении сервер также отправил клиенту список файлов
-                // String[] filesRaw = null;
-                // try {
-                //     Stream<Path> pathStream = Files.list(Paths.get("."));
-                //     filesRaw = pathStream.filter(Files::isRegularFile).map(Path::getFileName).map(Path::toString).toArray(String[]::new);
-                //     pathStream.close();
-                // } catch (IOException e) {}
+                List<String> commandNamesList = Arrays.stream(commandNames).toList();
 
                 receiveBuffer = new byte[4096];
                 receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
@@ -159,9 +169,13 @@ class MainClient {
                 while (true) {
                     String input = reader.readLine("> ");
                     String[] tokens = input.strip().split(" ");
-                    if (Arrays.binarySearch(commandNames, tokens[0]) >= 0) {
-                        
+                    if (commandNamesList.contains(tokens[0])) {
+                        // TODO: Отправить команду на сервер
                     } else if (tokens[0].isBlank()) {} else if (tokens[0].equals("exit")) {
+                        sendPacket = new Packet(clientUUID, 1, 0, null);
+                        serializedPacket = SerializationUtils.serialize(sendPacket); 
+                        sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, InetAddress.getLocalHost(), 3553);
+                        clientSocket.send(sendDatagramPacket);
                         break;
                     } else {
                         System.out.println("\u001B[31m" + input + " не распознано как имя команды. Введите help для справки." + "\u001B[0m");
@@ -176,8 +190,14 @@ class MainClient {
     }
 
     public static List<byte[]> packBytes(byte[] serializedUUID, byte[] serializedObject) {
-        int free_space = 4096 - 80 * 2;
         List<byte[]> result = new ArrayList<>();
+
+        // Обработка 1 пакета
+        if (serializedObject.length < 4096 - 80 * 2) {
+            result.add(ArrayUtils.addAll(serializedUUID, ArrayUtils.addAll(serializedObject, serializedUUID)));
+        }
+
+        int free_space = 4096 - 80;
         int parts = (int) Math.ceil((double) serializedObject.length / free_space);
         for (int i = 0; i < parts; i++) {
             byte[] part = Arrays.copyOfRange(serializedObject, i * free_space, (i + 1) * free_space > serializedObject.length ? serializedObject.length : (i + 1) * free_space);

@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import util.*;
+
 import org.apache.commons.lang3.SerializationUtils;
 
 import server.commands.Add;
@@ -21,7 +23,7 @@ import server.commands.AddIfMax;
 import server.commands.Clear;
 import server.commands.Command;
 import server.commands.CountLessThanDescription;
-import server.commands.Exit;
+// import server.commands.Exit;
 import server.commands.FilterContainsName;
 import server.commands.FilterGreaterThanGenre;
 import server.commands.Head;
@@ -64,7 +66,7 @@ public class MainServer {
         commandManager.register(new Show(collectionManager));
         commandManager.register(new Save(collectionManager, fileManager));
         commandManager.register(new Clear(collectionManager));
-        commandManager.register(new Exit(collectionManager));
+        // commandManager.register(new Exit(collectionManager));
         commandManager.register(new Update(collectionManager));
         commandManager.register(new RemoveById(collectionManager));
         commandManager.register(new Head(collectionManager));
@@ -85,24 +87,25 @@ public class MainServer {
             ByteBuffer buffer = ByteBuffer.allocate(4096);
             System.out.println("Сервер запущен, ожидаем запросы...");
 
-            boolean firstUUID = true;
             while (true) {
                 selector.select();
                 SelectionKey selectedKey = selector.selectedKeys().toArray(SelectionKey[]::new)[0];
                 selector.selectedKeys().remove(selectedKey);
-                System.out.println("Запрос найден, пытаемся обработать...");
+                System.out.println("Запрос получен, пытаемся обработать...");
                 SocketAddress clientAddress = server.receive(buffer);
                 buffer.flip();
                 byte[] receivedData = new byte[buffer.remaining()];
                 buffer.get(receivedData);
+                buffer.clear();
 
-                if ((receivedData.length == 80) && firstUUID) {
-                    UUID receivedUUID = SerializationUtils.deserialize(receivedData);
+                Packet receivedPacket = SerializationUtils.deserialize(receivedData);   
+                if (receivedPacket.isConnectionDefining()) {
+                    UUID receivedUUID = receivedPacket.getClientUUID();
                     if (userUUIDs.contains(receivedUUID)) {
-                        System.out.println("Серьёзная ошибка: пришёл одинокий UUID");
+                        System.out.println("Отключился клиент с UUID: " + receivedUUID);
                     } else {
                         userUUIDs.add(receivedUUID);
-                        System.out.println("Найден уникальный UUID");
+                        System.out.println("Уникальный UUID добавлен: " + receivedUUID);
                         byte[] serializedCommandNames = SerializationUtils.serialize(commandNames);
                         ByteBuffer sendBuffer = ByteBuffer.wrap(serializedCommandNames);
                         server.send(sendBuffer, clientAddress);
@@ -110,10 +113,13 @@ public class MainServer {
                         sendBuffer = ByteBuffer.wrap(serializedFileNames);
                         server.send(sendBuffer, clientAddress);
                     }
-                } else {
-                    System.out.println("Полученное сообщение не удовлетворило условиям и было отброшено");
-                    System.out.println(receivedData.length + " " + receivedData);
+                    continue;
                 }
+
+                if (condition) {
+                    
+                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();

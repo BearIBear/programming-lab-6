@@ -113,11 +113,9 @@ public class MainServer {
                         sendBuffer = ByteBuffer.wrap(serializedFileNames);
                         server.send(sendBuffer, clientAddress);
                     }
-                    continue;
-                }
-
-                if (condition) {
-                    
+                } else {
+                    // TODO: Сюда должен прилететь объект с именем команды (String), аргументами (String), объектом MusicBand
+                    // Команды возвращают String, а потом отправляют его на сервер
                 }
 
             }

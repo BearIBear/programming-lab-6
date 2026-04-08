@@ -1,15 +1,19 @@
 package util;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import models.*;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationUtils;
 
 // HEADER   DATA    HEADER   DATA
-public class Packet implements Serializable {
+public class Packet implements Serializable, Comparable<Packet> {
     public byte[] serializedClientUUID;
     public byte packetsAmount;
     public byte currentPacket; // Пакеты нумеровать будем как: [0;4]
@@ -51,12 +55,41 @@ public class Packet implements Serializable {
         }
     }
 
+    public static List<Packet> packObject(UUID clientUUID, Serializable o) {
+        byte[] serializedObject = SerializationUtils.serialize(o);
+        int capacity = 782;
+        byte packetsCount = (byte) Math.ceil((double) serializedObject.length / capacity); 
+        ArrayList<Packet> packets = new ArrayList<>();
+        for (int i = 0; i < packetsCount; i++) {
+            packets.add(new Packet(clientUUID, packetsCount, i,
+                Arrays.copyOfRange(serializedObject, i * capacity, Math.min((i + 1) * capacity, serializedObject.length))));
+        }
+        return packets;
+    }
+
+    public static Serializable restoreObject(ArrayList<Packet> packets) {
+        packets.sort(null);
+        byte[] data = new byte[0];
+        for (Packet packet : packets) {
+            data = ArrayUtils.addAll(data, packet.getActualData());
+        }
+        return SerializationUtils.deserialize(data);
+    }
+
     public static void main(String[] args) {
-        Color panda = Color.BLACK;
-        Packet bear = new Packet(UUID.randomUUID(), (byte) 1, (byte) 0, SerializationUtils.serialize(panda));
-        System.out.println(SerializationUtils.serialize(bear).length);
-        Color panda2 = SerializationUtils.deserialize(bear.readActualData());
-        System.out.println(panda2);
+        // Packet bear = new Packet(UUID.randomUUID(), 2, 0, SerializationUtils.serialize(Color.BLACK));
+        // Packet koala = new Packet(UUID.randomUUID(), 2, 1, SerializationUtils.serialize(Color.YELLOW));
+        // System.out.println(SerializationUtils.serialize(bear).length);
+        // System.out.println(SerializationUtils.serialize(koala).length);
+        UUID clientUUID = UUID.randomUUID();
+        MusicBand bears = new MusicBand("The Lighthouse Madness", new Coordinates((long) 50, 100), 200,
+        500, "Doodle let me go, doodle let me go, doodle let me go", MusicGenre.MATH_ROCK, new Person("Thomas Wake", LocalDate.now(), Color.BROWN));
+        System.out.println("Expected UUID: " + clientUUID);
+        System.out.println("MusicBand size: " + SerializationUtils.serialize(bears).length);
+        ArrayList<Packet> packets = (ArrayList<Packet>) Packet.packObject(clientUUID, bears);
+        System.out.println(packets);
+        MusicBand bearsRestored = (MusicBand) Packet.restoreObject(packets);
+        System.out.println(bearsRestored); 
     }
 
     public byte[] getSerializedClientUUID() {
@@ -83,7 +116,7 @@ public class Packet implements Serializable {
         return data;
     }
 
-    public byte[] readActualData() {
+    public byte[] getActualData() {
         return Arrays.copyOfRange(this.data, 0, this.readableDataLength);
     }
 
@@ -93,5 +126,16 @@ public class Packet implements Serializable {
 
     public boolean isConnectionDefining() {
         return readableDataLength == 0;
+    }
+
+    @Override
+    public int compareTo(Packet o) {
+        return Byte.compare(this.currentPacket, o.currentPacket);
+    }
+
+    @Override
+    public String toString() {
+        return "Packet [packetsAmount=" + packetsAmount + ", currentPacket=" + currentPacket + ", readableDataLength="
+                + readableDataLength + "]";
     }
 }

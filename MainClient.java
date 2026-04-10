@@ -179,10 +179,6 @@ class MainClient {
                         .build();
                 consoleManager.setReader(reader);
 
-                // TODO: Разделить данный луп на:
-                // 1. Клиентский, который просто считывает/проверяет данные, а потом печатает ответ сервера
-                // 2. Серверный (Вынести в отдельный файл), который просто получает данные от данного лупа и что-то с ними делает
-
                 while (true) {
                     String input = reader.readLine("> ");
                     String[] tokens = input.strip().split(" ");

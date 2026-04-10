@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @author Михаил
  */
 public class CollectionManager {
-    private PriorityQueue<MusicBand> collection; // TODO: Сделать так, чтобы nextId у банд был только в CollectionManager, а не в MusicBand
+    private PriorityQueue<MusicBand> collection;
     private LocalDateTime initTime;
     private static long nextId;
     private static ArrayList<Long> vacantIds = new ArrayList<>();

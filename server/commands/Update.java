@@ -5,6 +5,7 @@ import java.util.PriorityQueue;
 
 import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для обновления значения элемента коллекции, id которого равен заданному
@@ -17,23 +18,24 @@ public class Update extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
+    public CommandResult run(String[] args, MusicBand band) {
         args = Command.RemoveEmptyElements(args);
-        if (!checkArgAmount(args)) {
-            return true;
+        CommandResult commandResult = checkArgAmount(args);
+        if (!commandResult.isContinueFlag()) {
+
+            return commandResult;
         }
         int id = Integer.parseInt(args[1]); 
         PriorityQueue<MusicBand> musicBands = collectionManager.getCollection();
         for (MusicBand musicBand : musicBands) {
             if (musicBand.getId() == id) {
                 collectionManager.removeElement(id);
-                MusicBand bandToInsert = consoleManager.askMusicBand();
-                bandToInsert.setId(id);
-                collectionManager.addElement(bandToInsert);
-                return true;
+                band.setId(id);
+                collectionManager.addElement(band);
+                return commandResult;
             }
         }
-        consoleManager.getTerminal().writer().println("\u001B[31m" + this.name + " : Элемент с id = " + id + " не найден" + "\u001B[0m");
-        return true;
+        commandResult.addToMessage("\u001B[31m" + this.name + " : Элемент с id = " + id + " не найден" + "\u001B[0m");
+        return commandResult;
     }
 }

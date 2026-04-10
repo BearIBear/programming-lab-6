@@ -1,6 +1,13 @@
 package util;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,6 +82,25 @@ public class Packet implements Serializable, Comparable<Packet> {
         }
         return SerializationUtils.deserialize(data);
     }
+
+    public static void serverSendPackets(DatagramChannel server, ArrayList<Packet> packets, SocketAddress address) throws IOException {
+        ByteBuffer sendBuffer;
+        for (Packet packet : packets) {
+            byte[] serializedPacket = SerializationUtils.serialize(packet);
+            sendBuffer = ByteBuffer.wrap(serializedPacket);
+            server.send(sendBuffer, address);
+        }
+    }
+
+    public static void clientSendPackets(DatagramSocket client, ArrayList<Packet> packets, InetAddress address, int port) throws IOException {
+        DatagramPacket sendDatagramPacket;
+        for (Packet packet : packets) {
+            byte[] serializedPacket = SerializationUtils.serialize(packet);
+            sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, address, port);
+            client.send(sendDatagramPacket);
+        }
+    }
+
 
     public static void main(String[] args) {
         // Packet bear = new Packet(UUID.randomUUID(), 2, 0, SerializationUtils.serialize(Color.BLACK));

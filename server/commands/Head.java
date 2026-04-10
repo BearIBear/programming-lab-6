@@ -1,7 +1,9 @@
 package server.commands;
 
 
+import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для вывода первого элемента коллекции (head)
@@ -14,18 +16,18 @@ public class Head extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
-        if (!checkArgAmount(args)) {
-            return true;
+    public CommandResult run(String[] args, MusicBand band) {
+        CommandResult commandResult = checkArgAmount(args);
+        if (!commandResult.isContinueFlag()) {
+            return commandResult;
         }
         
         if (collectionManager.getCollection().size() == 0) {
-            consoleManager.getTerminal().writer().println("\u001B[31m" + this.name + " : Коллекция пустая" + "\u001B[0m");
-            return true;
+            commandResult.addToMessage("\u001B[31m" + this.name + " : Коллекция пустая" + "\u001B[0m");
+            return commandResult;
         }
 
-        consoleManager.getTerminal().writer().println(collectionManager.getCollection().peek());
-
-        return true;
+        commandResult.addToMessage(collectionManager.getCollection().peek().toString());
+        return commandResult;
     }
 }

@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -23,7 +23,6 @@ import server.commands.AddIfMax;
 import server.commands.Clear;
 import server.commands.Command;
 import server.commands.CountLessThanDescription;
-// import server.commands.Exit;
 import server.commands.FilterContainsName;
 import server.commands.FilterGreaterThanGenre;
 import server.commands.Head;
@@ -39,7 +38,7 @@ import server.managers.CommandManager;
 import server.managers.FileManager;
 
 public class MainServer {
-    private static final List<UUID> userUUIDs = new ArrayList<>();
+    private static final HashMap<UUID, ArrayList<Packet>> userPackets = new HashMap<>();
     public static void main(String[] args) {
         String fileName = System.getenv("INPUT_FILENAME");
         if (fileName == null || fileName.isBlank()) {
@@ -66,7 +65,6 @@ public class MainServer {
         commandManager.register(new Show(collectionManager));
         commandManager.register(new Save(collectionManager, fileManager));
         commandManager.register(new Clear(collectionManager));
-        // commandManager.register(new Exit(collectionManager));
         commandManager.register(new Update(collectionManager));
         commandManager.register(new RemoveById(collectionManager));
         commandManager.register(new Head(collectionManager));
@@ -84,8 +82,9 @@ public class MainServer {
             server.bind(new InetSocketAddress(3553));
             server.configureBlocking(false);
             server.register(selector, SelectionKey.OP_READ);
-            ByteBuffer buffer = ByteBuffer.allocate(4096);
+            ByteBuffer buffer = ByteBuffer.allocate(1024);
             System.out.println("Сервер запущен, ожидаем запросы...");
+
 
             while (true) {
                 selector.select();
@@ -98,24 +97,43 @@ public class MainServer {
                 buffer.get(receivedData);
                 buffer.clear();
 
-                Packet receivedPacket = SerializationUtils.deserialize(receivedData);   
+                Packet receivedPacket = SerializationUtils.deserialize(receivedData);
+                UUID receivedUUID = receivedPacket.getClientUUID();
                 if (receivedPacket.isConnectionDefining()) {
-                    UUID receivedUUID = receivedPacket.getClientUUID();
-                    if (userUUIDs.contains(receivedUUID)) {
+                    if (userPackets.containsKey(receivedUUID)) {
                         System.out.println("Отключился клиент с UUID: " + receivedUUID);
                     } else {
-                        userUUIDs.add(receivedUUID);
+                        userPackets.put(receivedUUID, new ArrayList<>());
                         System.out.println("Уникальный UUID добавлен: " + receivedUUID);
-                        byte[] serializedCommandNames = SerializationUtils.serialize(commandNames);
-                        ByteBuffer sendBuffer = ByteBuffer.wrap(serializedCommandNames);
-                        server.send(sendBuffer, clientAddress);
-                        byte[] serializedFileNames = SerializationUtils.serialize(fileNames);
-                        sendBuffer = ByteBuffer.wrap(serializedFileNames);
-                        server.send(sendBuffer, clientAddress);
+
+                        ArrayList<Packet> packetsToSend = (ArrayList<Packet>) Packet.packObject(receivedUUID, commandNames);
+                        Packet.serverSendPackets(server, packetsToSend, clientAddress);
+
+                        packetsToSend = (ArrayList<Packet>) Packet.packObject(receivedUUID, fileNames);
+                        Packet.serverSendPackets(server, packetsToSend, clientAddress);
                     }
                 } else {
-                    // TODO: Сюда должен прилететь объект с именем команды (String), аргументами (String), объектом MusicBand
-                    // Команды возвращают String, а потом отправляют его на сервер
+                    ArrayList<Packet> packets = userPackets.get(receivedUUID); 
+                    packets.add(receivedPacket);
+                    System.out.println("Пакет добавлен от UUID: " + receivedUUID);
+
+                    if (packets.size() == receivedPacket.getPacketsAmount()) {
+                        CommandPayload commandPayload = (CommandPayload) Packet.restoreObject(packets);
+                        CommandResult result = commandsList.get(commandPayload.getCommandName()).run(commandPayload.getArgs(), commandPayload.getBand());
+                        ArrayList<Packet> packetsToSend = (ArrayList<Packet>) Packet.packObject(receivedUUID, result);
+                        Packet.serverSendPackets(server, packetsToSend, clientAddress);
+                        userPackets.put(receivedUUID, new ArrayList<>());
+                        System.out.println("Команда " + commandPayload.getCommandName() + " обработана от UUID: " + receivedUUID);
+                    }
+
+
+                    
+
+
+                    // CommandPayload commandPayload = SerializationUtils.deserialize(receivedPacket.getActualData());
+                    // CommandResult result = commandsList.get(commandPayload.getCommandName()).run(commandPayload.getArgs(), commandPayload.getBand());
+                    // byte[] serializedCommandResult = SerializationUtils.serialize(result);
+                    // sendBuffer = ByteBuffer.wrap(serializedCommandResult);
                 }
 
             }

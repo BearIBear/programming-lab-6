@@ -26,10 +26,11 @@ import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 
 import client.managers.ConsoleManager;
+import util.CommandPayload;
+import util.CommandResult;
 import util.Packet;
 
 import org.jline.builtins.Completers.FileNameCompleter;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.SerializationUtils;
 
 /**
@@ -40,9 +41,8 @@ import org.apache.commons.lang3.SerializationUtils;
 class MainClient {
     public static void main(String[] args) {
         UUID clientUUID = UUID.randomUUID();
-        // d2c785a1-e155-4469-89b6-f7594d7774eb
         System.out.println("UUID Клиента: " + clientUUID);
-        try (DatagramSocket clientSocket = new DatagramSocket()) { // TODO: Сервер пусть будет на 3553
+        try (DatagramSocket clientSocket = new DatagramSocket()) {
             try {
                 clientSocket.setSoTimeout(5000);
                 Terminal terminal = TerminalBuilder.builder().system(true).build();
@@ -72,18 +72,35 @@ class MainClient {
                         System.out.println("Получение команд провалилось...");
                     }
                 }
-                
-                String[] commandNames = SerializationUtils.deserialize(receiveBuffer);
+
+                ArrayList<Packet> packets = new ArrayList<>();
+                Packet receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                packets.add(receivedPacket);
+                for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
+                    clientSocket.receive(receivePacket);
+                    receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                    packets.add(receivedPacket);
+                }
+                String[] commandNames = (String[]) Packet.restoreObject(packets);
                 System.out.println("Имена команд получены успешно");
 
                 String commands = "\\b(" + String.join("|", commandNames) + "|" + "exit" + ")\\b";
                 final Pattern commandsPattern = Pattern.compile(commands, Pattern.CASE_INSENSITIVE);
                 List<String> commandNamesList = Arrays.stream(commandNames).toList();
 
-                receiveBuffer = new byte[4096];
+                receiveBuffer = new byte[1024];
                 receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                 clientSocket.receive(receivePacket);
-                String[] filesRaw = SerializationUtils.deserialize(receiveBuffer);
+
+                packets = new ArrayList<>();
+                receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                packets.add(receivedPacket);
+                for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
+                    clientSocket.receive(receivePacket);
+                    receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                    packets.add(receivedPacket);
+                }
+                String[] filesRaw = (String[]) Packet.restoreObject(packets);
                 System.out.println("Имена файлов получены успешно");
 
                 String files = String.join("|", filesRaw);
@@ -169,8 +186,31 @@ class MainClient {
                 while (true) {
                     String input = reader.readLine("> ");
                     String[] tokens = input.strip().split(" ");
-                    if (commandNamesList.contains(tokens[0])) {
-                        // TODO: Отправить команду на сервер
+                    String commandName = tokens[0];
+                    if (commandNamesList.contains(commandName)) {
+                        CommandPayload commandPayload = new CommandPayload(commandName, tokens, null);
+
+                        if (commandName.contains("add") || commandName.contains("update")) {
+                            commandPayload.setBand(consoleManager.askMusicBand());
+                        }
+
+                        packets = (ArrayList<Packet>) Packet.packObject(clientUUID, commandPayload);
+                        Packet.clientSendPackets(clientSocket, packets, InetAddress.getLocalHost(), 3553);
+
+                        receiveBuffer = new byte[1024];
+                        receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                        clientSocket.receive(receivePacket);
+
+                        packets = new ArrayList<>();
+                        receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                        packets.add(receivedPacket);
+                        for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
+                            clientSocket.receive(receivePacket);
+                            receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                            packets.add(receivedPacket);
+                        }
+                        CommandResult result = (CommandResult) Packet.restoreObject(packets);
+                        terminal.writer().println(result.getMessage());
                     } else if (tokens[0].isBlank()) {} else if (tokens[0].equals("exit")) {
                         sendPacket = new Packet(clientUUID, 1, 0, null);
                         serializedPacket = SerializationUtils.serialize(sendPacket); 
@@ -187,22 +227,5 @@ class MainClient {
         } catch (SocketException e) {
             e.printStackTrace();
         }
-    }
-
-    public static List<byte[]> packBytes(byte[] serializedUUID, byte[] serializedObject) {
-        List<byte[]> result = new ArrayList<>();
-
-        // Обработка 1 пакета
-        if (serializedObject.length < 4096 - 80 * 2) {
-            result.add(ArrayUtils.addAll(serializedUUID, ArrayUtils.addAll(serializedObject, serializedUUID)));
-        }
-
-        int free_space = 4096 - 80;
-        int parts = (int) Math.ceil((double) serializedObject.length / free_space);
-        for (int i = 0; i < parts; i++) {
-            byte[] part = Arrays.copyOfRange(serializedObject, i * free_space, (i + 1) * free_space > serializedObject.length ? serializedObject.length : (i + 1) * free_space);
-            result.add(ArrayUtils.addAll(serializedUUID, ArrayUtils.addAll(part, serializedUUID)));
-        }
-        return result;
     }
 }

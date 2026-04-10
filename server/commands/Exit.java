@@ -1,7 +1,9 @@
 package server.commands;
 
 
+import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для завершения работы программы (без сохранения в файл)
@@ -14,10 +16,11 @@ public class Exit extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
-        if (!checkArgAmount(args)) {
-            return true;
+    public CommandResult run(String[] args, MusicBand band) {
+        CommandResult commandResult = checkArgAmount(args);
+        if (!commandResult.isContinueFlag()) {
+            return commandResult;
         }
-        return false;
+        return commandResult;
     }
 }

@@ -1,7 +1,7 @@
 package models;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
+// import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -19,18 +19,20 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
     private String description; //Поле может быть null
     private MusicGenre genre; //Поле может быть null
     private Person frontMan; //Поле не может быть null
-    private static long nextId = 1;
-    private static ArrayList<Long> vacantIds = new ArrayList<>();
+    // private static long nextId = 1;
+    // private static ArrayList<Long> vacantIds = new ArrayList<>();
 
     public MusicBand(String name, Coordinates coordinates, long numberOfParticipants, long singlesCount,
             String description, MusicGenre genre, Person frontMan) {
 
-        if (vacantIds.isEmpty()) {
-            this.id = nextId++;
-        } else {
-            this.id = vacantIds.remove(0);
-        }
+        // if (vacantIds.isEmpty()) {
+        //     this.id = nextId++;
+        // } else {
+        //     this.id = vacantIds.remove(0);
+        // }
         
+        this.id = 1;
+
         if (name == null || name.equals("")) {
             throw new RuntimeException("name не может быть null");
         }
@@ -107,35 +109,35 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
         return Long.compare(this.id, other.id);
     }
 
-    public static void setNextId(long nextId) {
-        MusicBand.nextId = nextId;
-    }
+    // public static void setNextId(long nextId) {
+    //     MusicBand.nextId = nextId;
+    // }
 
-    public static ArrayList<Long> getVacantIds() {
-        return vacantIds;
-    }
+    // public static ArrayList<Long> getVacantIds() {
+    //     return vacantIds;
+    // }
 
-    public static void setVacantIds(ArrayList<Long> vacantIds) {
-        MusicBand.vacantIds = vacantIds;
-    }
+    // public static void setVacantIds(ArrayList<Long> vacantIds) {
+    //     MusicBand.vacantIds = vacantIds;
+    // }
 
-    public static void addVacantId(Long vacantId) {
-        MusicBand.vacantIds.add(vacantId);
-    }
+    // public static void addVacantId(Long vacantId) {
+    //     MusicBand.vacantIds.add(vacantId);
+    // }
 
-    public static long getNextId() {
-        return nextId;
-    }
+    // public static long getNextId() {
+    //     return nextId;
+    // }
 
     public void setId(long id) {
         this.id = id;
     }
 
-    public void fixId() {
-        if (vacantIds.isEmpty()) {
-            this.id = nextId++;
-        } else {
-            this.id = vacantIds.remove(0);
-        }
-    }
+    // public void fixId() {
+    //     if (vacantIds.isEmpty()) {
+    //         this.id = nextId++;
+    //     } else {
+    //         this.id = vacantIds.remove(0);
+    //     }
+    // }
 }

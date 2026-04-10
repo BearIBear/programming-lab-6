@@ -1,5 +1,6 @@
 package server.managers;
 
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 import models.MusicBand;
@@ -14,6 +15,8 @@ import java.time.LocalDateTime;
 public class CollectionManager {
     private PriorityQueue<MusicBand> collection; // TODO: Сделать так, чтобы nextId у банд был только в CollectionManager, а не в MusicBand
     private LocalDateTime initTime;
+    private static long nextId;
+    private static ArrayList<Long> vacantIds = new ArrayList<>();
 
     public CollectionManager() {
         this.collection = new PriorityQueue<>();
@@ -29,6 +32,7 @@ public class CollectionManager {
     }    
 
     public void addElement(MusicBand band) {
+        CollectionManager.fixId(band);
         collection.add(band);
     }
 
@@ -44,5 +48,33 @@ public class CollectionManager {
             }
         }
         return false;
+    }
+
+    public static void setNextId(long nextId) {
+        CollectionManager.nextId = nextId;
+    }
+
+    public static long getNextId() {
+        return nextId;
+    }
+
+    public static void fixId(MusicBand band) {
+        if (vacantIds.isEmpty()) {
+            band.setId(nextId++);
+        } else {
+            band.setId(vacantIds.remove(0));
+        }
+    }
+
+    public static ArrayList<Long> getVacantIds() {
+        return vacantIds;
+    }
+
+    public static void setVacantIds(ArrayList<Long> vacantIds) {
+        CollectionManager.vacantIds = vacantIds;
+    }
+
+    public static void addVacantId(Long vacantId) {
+        CollectionManager.vacantIds.add(vacantId);
     }
 }

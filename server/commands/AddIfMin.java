@@ -1,8 +1,11 @@
 package server.commands;
 
 
+import java.util.PriorityQueue;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для добавления элемента, если его значение меньше наименьшего элемента коллекции
@@ -11,22 +14,25 @@ import server.managers.CollectionManager;
  */
 public class AddIfMin extends Command {
     public AddIfMin(CollectionManager collectionManager) {
-        super("add_if_min", "добавить новый элемент в коллекцию, если его значение превышает значение наибольшего элемента этой коллекции", 0, collectionManager);
+        super("add_if_min", "добавить новый элемент в коллекцию, если его значение меньше значения наименьшего элемента этой коллекции", 0, collectionManager);
     }
 
     @Override
-    public boolean run(String[] args) {
-        if (!checkArgAmount(args)) {
-            return true;
+    public CommandResult run(String[] args, MusicBand bandToAdd) {
+        CommandResult commandResult = checkArgAmount(args);
+        if (!commandResult.isContinueFlag()) {
+
+            return commandResult;
         }
 
-        MusicBand bandToAdd = consoleManager.askMusicBand();
-        for (MusicBand band : collectionManager.getCollection()) {
-            if (band.compareTo(bandToAdd) < 1) {
-                return true;
-            }
+        PriorityQueue<MusicBand> bands = collectionManager.getCollection();
+        if (bands.stream().anyMatch(band -> band.compareTo(bandToAdd) < 1)) {
+            commandResult.setMessage("Банда не добавлена");
+            return commandResult;
         }
+        
         collectionManager.addElement(bandToAdd);
-        return true;
+        commandResult.setMessage("Банда добавлена успешно");
+        return commandResult;
     }
 }

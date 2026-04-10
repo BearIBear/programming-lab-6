@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": 0,
     "name": "Skibidi",
     "coordinates": {
       "x": 5,
@@ -18,7 +18,7 @@
     }
   },
   {
-    "id": 3,
+    "id": 1,
     "name": "Пупсёныши",
     "coordinates": {
       "x": 50,
@@ -54,7 +54,7 @@
     }
   },
   {
-    "id": 4,
+    "id": 3,
     "name": "Миха",
     "coordinates": {
       "x": 1,
@@ -73,24 +73,6 @@
   },
   {
     "id": 5,
-    "name": "testovick",
-    "coordinates": {
-      "x": 50,
-      "y": Infinity
-    },
-    "creationDate": "Mar 11, 2026, 10:57:03 AM",
-    "numberOfParticipants": 50,
-    "singlesCount": 50,
-    "description": "50",
-    "genre": "POP",
-    "frontMan": {
-      "name": "Helo",
-      "birthday": "2006-12-12",
-      "eyeColor": "RED"
-    }
-  },
-  {
-    "id": 6,
     "name": "A",
     "coordinates": {
       "x": 1,
@@ -104,6 +86,24 @@
       "name": "Hello",
       "birthday": "2007-12-12",
       "eyeColor": "RED"
+    }
+  },
+  {
+    "id": 4,
+    "name": "Михаилы",
+    "coordinates": {
+      "x": 432,
+      "y": 200.0
+    },
+    "creationDate": "Apr 10, 2026, 1:50:38 PM",
+    "numberOfParticipants": 5,
+    "singlesCount": 1,
+    "description": "Агашеньки",
+    "genre": "POP",
+    "frontMan": {
+      "name": "Пупс-Медведь",
+      "birthday": "2026-04-10",
+      "eyeColor": "BROWN"
     }
   }
 ]

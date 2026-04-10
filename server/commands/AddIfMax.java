@@ -1,8 +1,11 @@
 package server.commands;
 
 
+import java.util.PriorityQueue;
+
 import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для добавления элемента, если его значение превышает наибольший элемент
@@ -15,20 +18,20 @@ public class AddIfMax extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
-        if (!checkArgAmount(args)) {
-            return true;
+    public CommandResult run(String[] args, MusicBand bandToAdd) {
+        CommandResult commandResult = checkArgAmount(args);
+        if (!commandResult.isContinueFlag()) {
+            return commandResult;
         }
 
-        MusicBand bandToAdd = consoleManager.askMusicBand();
-        for (MusicBand band : collectionManager.getCollection()) {
-            if (band.compareTo(bandToAdd) > -1) {
-                consoleManager.getTerminal().writer().println("Банда не добавлена");
-                return true;
-            }
+        PriorityQueue<MusicBand> bands = collectionManager.getCollection();
+        if (bands.stream().anyMatch(band -> band.compareTo(bandToAdd) > -1)) {
+            commandResult.setMessage("Банда не добавлена");
+            return commandResult;
         }
+
         collectionManager.addElement(bandToAdd);
-        consoleManager.getTerminal().writer().println("Банда добавлена успешно");
-        return true;
+        commandResult.setMessage("Банда добавлена успешно");
+        return commandResult;
     }
 }

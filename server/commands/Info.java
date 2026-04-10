@@ -1,7 +1,9 @@
 package server.commands;
 
 
+import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для вывода информации о коллекции (тип, количество элементов, дата инициализации)
@@ -14,13 +16,15 @@ public class Info extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
-        if (!checkArgAmount(args)) {
-            return true;
+    public CommandResult run(String[] args, MusicBand band) {
+        CommandResult commandResult = checkArgAmount(args);
+        if (!commandResult.isContinueFlag()) {
+
+            return commandResult;
         }
-        consoleManager.getTerminal().writer().println("Тип коллекции: PriorityQueue");
-        consoleManager.getTerminal().writer().println("Количество элементов: " + collectionManager.getCollection().size());
-        consoleManager.getTerminal().writer().println("Дата инициализации: " + collectionManager.getInitTime());
-        return true;
+        commandResult.addToMessage("Тип коллекции: PriorityQueue");
+        commandResult.addToMessage("Количество элементов: " + collectionManager.getCollection().size());
+        commandResult.addToMessage("Дата инициализации: " + collectionManager.getInitTime());
+        return commandResult;
     }
 }

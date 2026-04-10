@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для вывода элементов, значение поля name которых содержит заданную подстроку
@@ -17,18 +18,17 @@ public class FilterContainsName extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
+    public CommandResult run(String[] args, MusicBand band) {
         String description = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
         String [] newArgs = {args[0], description};
-        if (!checkArgAmount(newArgs)) {
-            return true;
+
+        CommandResult commandResult = checkArgAmount(newArgs);
+        if (!commandResult.isContinueFlag()) {
+            return commandResult;
         }
 
-        for (MusicBand band : collectionManager.getCollection()) {
-            if (band.getName().contains(newArgs[1])) {
-                consoleManager.getTerminal().writer().println(band);
-            }
-        }
-        return true;
+        collectionManager.getCollection().stream().filter(band1 -> band1.getDescription().contains(description))
+         .forEach(band1 -> commandResult.addToMessage(band1.toString()));
+        return commandResult;
     }
 }

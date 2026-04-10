@@ -3,6 +3,7 @@ package server.commands;
 
 import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для удаления элемента из коллекции по его id
@@ -15,23 +16,24 @@ public class RemoveById extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
+    public CommandResult run(String[] args, MusicBand band) {
         args = Command.RemoveEmptyElements(args);
-        if (!checkArgAmount(args)) {
-            return true;
+        CommandResult commandResult = checkArgAmount(args);
+        if (!commandResult.isContinueFlag()) {
+
+            return commandResult;
         }
         try {
             long id = Long.parseLong(args[1]);
             if (collectionManager.removeElement(id)) {
-                consoleManager.getTerminal().writer().println("Элемент с id = " + id + " успешно удалён"); // TODO: подобные вещи необходимо заменить на: result.setFeedback("...")
-                // result = класс execResult
-                MusicBand.addVacantId(id);
+                commandResult.addToMessage("Элемент с id = " + id + " успешно удалён");
+                CollectionManager.addVacantId(id);
             } else {
-                consoleManager.getTerminal().writer().println("\u001B[31m" + this.name + " : Элемент с id = " + id + " не найден" + "\u001B[0m");
+                commandResult.addToMessage("\u001B[31m" + this.name + " : Элемент с id = " + id + " не найден" + "\u001B[0m");
             }
         } catch (NumberFormatException e) {
-            consoleManager.getTerminal().writer().println("\u001B[31m" + this.name + "remove_by_id : Позиционный параметр id принимает только значения формата long" + "\u001B[0m");
+            commandResult.addToMessage("\u001B[31m" + this.name + "remove_by_id : Позиционный параметр id принимает только значения формата long" + "\u001B[0m");
         }
-        return true;
+        return commandResult;
     }
 }

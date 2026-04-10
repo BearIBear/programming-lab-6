@@ -57,7 +57,7 @@ public class FileManager {
             }
             if (jsonString.length() == 0) {
                 System.out.println("Файл пустой, коллекций нет");
-                MusicBand.setNextId(1);
+                CollectionManager.setNextId(1);
                 return;
             }
 
@@ -75,16 +75,16 @@ public class FileManager {
                 }
                 System.out.println("Файл загружен, количество банд: " + loadedCollection.size());
             }
-            MusicBand.setNextId(max_id + 1);
+            CollectionManager.setNextId(max_id + 1);
 
             // Ищем пропущенные ID
             if (max_id > loadedCollection.size()) {
                 for (long i = 1; i < max_id; i++) {
                     Long searchedId = i; // Иначе выдаёт ошибку, что "i должен быть final"
-                    if (loadedCollection.stream().filter(band -> Long.compare(band.getId(), searchedId) == 0).count() > 0) {
+                    if (loadedCollection.stream().anyMatch(band -> Long.compare(band.getId(), searchedId) == 0)) {
                         continue;
                     } else {
-                        MusicBand.addVacantId(searchedId);
+                        CollectionManager.addVacantId(searchedId);
                     }
                 }
             }

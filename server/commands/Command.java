@@ -3,9 +3,10 @@ package server.commands;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
-
+import models.MusicBand;
 import server.managers.CollectionManager;
 import server.managers.CommandManager;
+import util.CommandResult;
 
 /**
  * Абстрактный базовый класс для всех команд
@@ -26,8 +27,7 @@ public abstract class Command {
         this.collectionManager = collectionManager;
     }
 
-    public abstract boolean run(String[] args); // TODO: Добавить ещё в аргументы сюда MusicBand band, который может быть null
-    // TODO: boolean заменить на кастомный класс, содержащий: stopFlag (состояние работы программы), message (сообщение, привязанное к состоянию)
+    public abstract CommandResult run(String[] args, MusicBand band);
     
     public String getName() {
         return name;
@@ -49,16 +49,14 @@ public abstract class Command {
         this.commandManager = commandManager;
     }
 
-    public boolean checkArgAmount(String[] args) {
+    public CommandResult checkArgAmount(String[] args) {
         if (args.length < this.argsAmount) {
-            consoleManager.getTerminal().writer().println("\u001B[31m" + this.name + " : Недостаточно параметров" + "\u001B[0m");
-            return false;
+            return new CommandResult(false, "\u001B[31m" + this.name + " : Недостаточно параметров" + "\u001B[0m");
         }
         if (args.length > this.argsAmount) {
-            consoleManager.getTerminal().writer().println("\u001B[31m" + this.name + " : Слишком много параметров" + "\u001B[0m");
-            return false;
+            return new CommandResult(false, "\u001B[31m" + this.name + " : Слишком много параметров" + "\u001B[0m");
         }
-        return true;
+        return new CommandResult(true, "");
     }
 
     public static String[] RemoveEmptyElements(String[] input) {

@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import models.MusicBand;
 import server.managers.CollectionManager;
+import util.CommandResult;
 
 /**
  * Команда для вывода количества элементов, значение поля description которых меньше заданного
@@ -17,20 +18,16 @@ public class CountLessThanDescription extends Command {
     }
 
     @Override
-    public boolean run(String[] args) {
+    public CommandResult run(String[] args, MusicBand band) {
         String description = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-        String [] newArgs = {args[0], description};
-        if (!checkArgAmount(newArgs)) {
-            return true;
+        String[] newArgs = {args[0], description};
+
+        CommandResult commandResult = checkArgAmount(newArgs);
+        if (!commandResult.isContinueFlag()) {
+            return commandResult;
         }
 
-        int count = 0; 
-        for (MusicBand band : collectionManager.getCollection()) {
-            if (band.getDescription().compareTo(description) < 0) {
-                count += 1;
-            }
-        }
-        consoleManager.getTerminal().writer().println(count);
-        return true;
+        commandResult.addToMessage(Long.toString(collectionManager.getCollection().stream().filter(bandToCheck -> bandToCheck.getDescription().compareTo(description) < 0).count()));
+        return commandResult;
     }
 }

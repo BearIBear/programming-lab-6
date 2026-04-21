@@ -86,7 +86,9 @@ public class MainServer {
 
         try {
             Terminal terminal = TerminalBuilder.builder().system(true).build();
+            terminal.enterRawMode();
             NonBlockingReader reader = terminal.reader();
+            
             String serverCommand = "";
             char readCharacter = 0;
     
@@ -155,7 +157,7 @@ public class MainServer {
                         int codeCharacter = reader.read();
                         readCharacter = (char) codeCharacter;
                         if (readCharacter == '\r' || readCharacter == '\n' || codeCharacter == 10 || codeCharacter == 13) {
-                            System.out.println();
+                            System.out.print("\r\n");
                             serverCommand = stringBuilder.toString().trim();
                             stringBuilder.setLength(0);
                             if (serverCommand.equals("exit")) {

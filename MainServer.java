@@ -153,8 +153,8 @@ public class MainServer {
                         }
                     }
 
-                    if (reader.available() > 0) {
-                        int codeCharacter = reader.read();
+                    int codeCharacter = reader.read(10L);
+                    if (codeCharacter >= 0) {
                         readCharacter = (char) codeCharacter;
                         if (readCharacter == '\r' || readCharacter == '\n' || codeCharacter == 10 || codeCharacter == 13) {
                             System.out.print("\r\n");

@@ -6,7 +6,7 @@ mkdir out_client
 mkdir build_jar_client
 
 echo Compiling Java source files...
-javac -encoding utf-8 -cp "lib/*" -d out_client MainClient.java client\managers\*.java models\*.java util\*.java
+javac --release 17 -encoding utf-8 -cp "lib/*" -d out_client MainClient.java client\managers\*.java models\*.java util\*.java
 if %errorlevel% neq 0 (
     echo Compilation failed!
     exit /b %errorlevel%

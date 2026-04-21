@@ -6,7 +6,7 @@ mkdir out_server
 mkdir build_jar_server
 
 echo Compiling Java source files...
-javac -encoding utf-8 -cp "lib/*" -d out_server MainServer.java server\commands\*.java server\managers\*.java models\*.java util\*.java
+javac --release 17 -encoding utf-8 -cp "lib/*" -d out_server MainServer.java server\commands\*.java server\managers\*.java models\*.java util\*.java
 if %errorlevel% neq 0 (
     echo Compilation failed!
     exit /b %errorlevel%

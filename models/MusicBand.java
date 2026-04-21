@@ -97,7 +97,7 @@ public class MusicBand implements Comparable<MusicBand>, Serializable {
 
     @Override
     public int compareTo(MusicBand other) {
-        return Long.compare(this.id, other.id);
+        return this.name.compareTo(other.name);
     }
 
     public void setId(long id) {

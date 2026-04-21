@@ -1,2 +1,2 @@
 Main-Class: Main
-Class-Path: lib/gson-2.13.2.jar lib/jansi-2.4.2.jar lib/jline-3.30.7.jar lib/commons-lang3-3.14.0.jar
+Class-Path: lib/gson-2.13.2.jar lib/jansi-2.4.2.jar lib/jline-3.30.7.jar lib/commons-lang3-3.14.0.jar lib/log4j-core-2.25.4.jar lib/log4j-api-2.25.4.jar

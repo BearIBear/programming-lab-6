@@ -19,19 +19,19 @@
   },
   {
     "id": 2,
-    "name": "Пупсёныши",
+    "name": "Миха",
     "coordinates": {
-      "x": 50,
-      "y": 40.0
+      "x": 1,
+      "y": 1.0
     },
-    "creationDate": "Mar 6, 2026, 8:23:13 PM",
-    "numberOfParticipants": 10,
-    "singlesCount": 1000,
-    "description": "Описание великое",
+    "creationDate": "Feb 26, 2026, 5:42:18 AM",
+    "numberOfParticipants": 1,
+    "singlesCount": 1,
+    "description": "1",
     "genre": "POP",
     "frontMan": {
-      "name": "Суфлеть",
-      "birthday": "2027-10-10",
+      "name": "Мишаил",
+      "birthday": "2006-12-11",
       "eyeColor": "RED"
     }
   },
@@ -55,24 +55,24 @@
   },
   {
     "id": 4,
-    "name": "Миха",
+    "name": "Пупсёныши",
     "coordinates": {
-      "x": 1,
-      "y": 1.0
+      "x": 50,
+      "y": 40.0
     },
-    "creationDate": "Feb 26, 2026, 5:42:18 AM",
-    "numberOfParticipants": 1,
-    "singlesCount": 1,
-    "description": "1",
+    "creationDate": "Mar 6, 2026, 8:23:13 PM",
+    "numberOfParticipants": 10,
+    "singlesCount": 1000,
+    "description": "Описание великое",
     "genre": "POP",
     "frontMan": {
-      "name": "Мишаил",
-      "birthday": "2006-12-11",
+      "name": "Суфлеть",
+      "birthday": "2027-10-10",
       "eyeColor": "RED"
     }
   },
   {
-    "id": 6,
+    "id": 5,
     "name": "Михаилы",
     "coordinates": {
       "x": 432,
@@ -90,7 +90,7 @@
     }
   },
   {
-    "id": 5,
+    "id": 6,
     "name": "Флон",
     "coordinates": {
       "x": 50,

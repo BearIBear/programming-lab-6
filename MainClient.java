@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +45,14 @@ class MainClient {
         System.out.println("UUID Клиента: " + clientUUID);
         try (DatagramSocket clientSocket = new DatagramSocket()) {
             try {
+
+                InetAddress serverAddr;
+                try {
+                    serverAddr = InetAddress.getByName("helios");
+                } catch (Exception e) {
+                    System.out.println("Создание клиента на helios провалилась, делаем на localhost...");
+                    serverAddr = InetAddress.getLocalHost();
+                }
                 clientSocket.setSoTimeout(5000);
                 Terminal terminal = TerminalBuilder.builder().system(true).build();
                 History history = new DefaultHistory();
@@ -53,7 +62,7 @@ class MainClient {
                 System.out.println("Клиент запущен, пытаемся передать UUID");
                 Packet sendPacket = new Packet(clientUUID, 1, 0, null);
                 byte[] serializedPacket = SerializationUtils.serialize(sendPacket);
-                DatagramPacket sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, InetAddress.getLocalHost(), 3553);
+                DatagramPacket sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 3553);
                 clientSocket.send(sendDatagramPacket);
                 System.out.println("UUID отправлен успешно");
 
@@ -82,6 +91,7 @@ class MainClient {
                     packets.add(receivedPacket);
                 }
                 String[] commandNames = (String[]) Packet.restoreObject(packets);
+                commandNames = Arrays.stream(commandNames).filter(Predicate.not(name -> name.equals("save"))).toArray(String[]::new);
                 System.out.println("Имена команд получены успешно");
 
                 String commands = "\\b(" + String.join("|", commandNames) + "|" + "exit" + ")\\b";
@@ -191,7 +201,7 @@ class MainClient {
                         }
 
                         packets = (ArrayList<Packet>) Packet.packObject(clientUUID, commandPayload);
-                        Packet.clientSendPackets(clientSocket, packets, InetAddress.getLocalHost(), 3553);
+                        Packet.clientSendPackets(clientSocket, packets, serverAddr, 3553);
 
                         receiveBuffer = new byte[1024];
                         receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
@@ -210,7 +220,7 @@ class MainClient {
                     } else if (tokens[0].isBlank()) {} else if (tokens[0].equals("exit")) {
                         sendPacket = new Packet(clientUUID, 1, 0, null);
                         serializedPacket = SerializationUtils.serialize(sendPacket); 
-                        sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, InetAddress.getLocalHost(), 3553);
+                        sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 3553);
                         clientSocket.send(sendDatagramPacket);
                         break;
                     } else {
@@ -218,7 +228,11 @@ class MainClient {
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Не удалось создать терминал: " + e.getMessage());
+                if (e instanceof SocketTimeoutException) {
+                    System.err.println("Соединение потеряно: " + e.getMessage());
+                } else {
+                    System.err.println("Не удалось создать терминал: " + e.getMessage());
+                }
             }
         } catch (SocketException e) {
             e.printStackTrace();

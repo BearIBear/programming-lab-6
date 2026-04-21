@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Менеджер для сохранения и загрузки коллекции из файла JSON с использованием Gson
  *
@@ -24,6 +27,7 @@ import java.util.Scanner;
 public class FileManager {
     private String fileName;
     private Gson gson;
+    private static final Logger log = LogManager.getLogger();
 
     public FileManager(String fileName) {
         this.fileName = fileName;
@@ -36,16 +40,16 @@ public class FileManager {
 
     public void load(CollectionManager collectionManager) {
         if (fileName == null || fileName.isEmpty()) {
-            System.out.println("Имя файла не указано, загрузки не будет");
+            log.error("File name is blank");
             return;
         }
         File file = new File(fileName);
         if (!file.exists()) {
-            System.out.println("Файла " + fileName + " нет");
+            log.error("File " + fileName + " doesn't exist");
             return;
         }
         if (!file.canRead()) {
-            System.out.println("Нет прав на чтение файла " + fileName);
+            log.error("No permissions to read the file " + fileName);
             return;
         }
 
@@ -56,7 +60,7 @@ public class FileManager {
                 jsonString.append(fileScanner.nextLine());
             }
             if (jsonString.length() == 0) {
-                System.out.println("Файл пустой, коллекций нет");
+                log.warn("File is empty, no collections will be loaded");
                 CollectionManager.setNextId(1);
                 return;
             }
@@ -73,7 +77,7 @@ public class FileManager {
                     collectionManager.addElement(band);
                     max_id = Math.max(band.getId(), max_id);
                 }
-                System.out.println("Файл загружен, количество банд: " + loadedCollection.size());
+                log.info("File loaded, total bands: " + loadedCollection.size());
             }
             CollectionManager.setNextId(max_id + 1);
 

@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 public class FileManager {
     private String fileName;
     private Gson gson;
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger(FileManager.class);
 
     public FileManager(String fileName) {
         this.fileName = fileName;

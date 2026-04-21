@@ -46,7 +46,7 @@ import server.managers.FileManager;
 
 public class MainServer {
     private static final HashMap<UUID, ArrayList<Packet>> userPackets = new HashMap<>();
-    private static final Logger log = LogManager.getLogger();
+    private static final Logger log = LogManager.getLogger(MainServer.class);
     public static void main(String[] args) {
         String fileName = System.getenv("INPUT_FILENAME");
         if (fileName == null || fileName.isBlank()) {

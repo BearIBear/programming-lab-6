@@ -28,6 +28,6 @@ public class CommandResult implements Serializable {
     }
 
     public void addToMessage(String messageToAdd) {
-        this.setMessage(message + System.lineSeparator() + messageToAdd);
+        this.setMessage(message.isBlank() ? messageToAdd : message + System.lineSeparator() + messageToAdd);
     }
 }

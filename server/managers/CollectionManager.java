@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class CollectionManager {
     private PriorityQueue<MusicBand> collection;
     private LocalDateTime initTime;
-    private static long nextId;
+    private static long nextId = 1;
     private static ArrayList<Long> vacantIds = new ArrayList<>();
 
     public CollectionManager() {

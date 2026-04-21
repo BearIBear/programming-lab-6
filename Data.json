@@ -1,6 +1,6 @@
 [
   {
-    "id": 0,
+    "id": 1,
     "name": "Skibidi",
     "coordinates": {
       "x": 5,
@@ -18,7 +18,7 @@
     }
   },
   {
-    "id": 1,
+    "id": 2,
     "name": "Пупсёныши",
     "coordinates": {
       "x": 50,
@@ -36,7 +36,7 @@
     }
   },
   {
-    "id": 2,
+    "id": 3,
     "name": "Пупсы",
     "coordinates": {
       "x": 50,
@@ -54,7 +54,7 @@
     }
   },
   {
-    "id": 3,
+    "id": 4,
     "name": "Миха",
     "coordinates": {
       "x": 1,
@@ -72,24 +72,7 @@
     }
   },
   {
-    "id": 5,
-    "name": "A",
-    "coordinates": {
-      "x": 1,
-      "y": Infinity
-    },
-    "creationDate": "Mar 11, 2026, 10:59:20 AM",
-    "numberOfParticipants": 12412,
-    "singlesCount": 1,
-    "genre": "POP",
-    "frontMan": {
-      "name": "Hello",
-      "birthday": "2007-12-12",
-      "eyeColor": "RED"
-    }
-  },
-  {
-    "id": 4,
+    "id": 6,
     "name": "Михаилы",
     "coordinates": {
       "x": 432,
@@ -104,6 +87,24 @@
       "name": "Пупс-Медведь",
       "birthday": "2026-04-10",
       "eyeColor": "BROWN"
+    }
+  },
+  {
+    "id": 5,
+    "name": "Флон",
+    "coordinates": {
+      "x": 50,
+      "y": 50.0
+    },
+    "creationDate": "Apr 21, 2026, 3:33:16 PM",
+    "numberOfParticipants": 2,
+    "singlesCount": 30,
+    "description": "Гордуном",
+    "genre": "PSYCHEDELIC_ROCK",
+    "frontMan": {
+      "name": "Бубс",
+      "birthday": "2006-05-05",
+      "eyeColor": "BLACK"
     }
   }
 ]

@@ -37,7 +37,7 @@ public class CommandManager {
         scriptFiles.add(file);
     }
 
-    public void clearScriptFile() {
+    public void clearScriptFiles() {
         scriptFiles.clear();
     }
 

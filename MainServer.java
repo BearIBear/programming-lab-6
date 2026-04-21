@@ -49,7 +49,7 @@ public class MainServer {
 
         String[] fileNames = null;
         try {
-            Stream<Path> pathStream = Files.list(Paths.get("."));
+            Stream<Path> pathStream = Files.list(Paths.get("./scripts/"));
             fileNames = pathStream.filter(Files::isRegularFile).map(Path::getFileName).map(Path::toString).toArray(String[]::new);
             pathStream.close();
         } catch (IOException e) {}
@@ -120,20 +120,12 @@ public class MainServer {
                     if (packets.size() == receivedPacket.getPacketsAmount()) {
                         CommandPayload commandPayload = (CommandPayload) Packet.restoreObject(packets);
                         CommandResult result = commandsList.get(commandPayload.getCommandName()).run(commandPayload.getArgs(), commandPayload.getBand());
+                        commandManager.clearScriptFiles();
                         ArrayList<Packet> packetsToSend = (ArrayList<Packet>) Packet.packObject(receivedUUID, result);
                         Packet.serverSendPackets(server, packetsToSend, clientAddress);
                         userPackets.put(receivedUUID, new ArrayList<>());
                         System.out.println("Команда " + commandPayload.getCommandName() + " обработана от UUID: " + receivedUUID);
                     }
-
-
-                    
-
-
-                    // CommandPayload commandPayload = SerializationUtils.deserialize(receivedPacket.getActualData());
-                    // CommandResult result = commandsList.get(commandPayload.getCommandName()).run(commandPayload.getArgs(), commandPayload.getBand());
-                    // byte[] serializedCommandResult = SerializationUtils.serialize(result);
-                    // sendBuffer = ByteBuffer.wrap(serializedCommandResult);
                 }
 
             }

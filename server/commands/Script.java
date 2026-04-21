@@ -24,7 +24,6 @@ public class Script extends Command {
         args = Command.RemoveEmptyElements(args);
         CommandResult commandResult = checkArgAmount(args);
         if (!commandResult.isContinueFlag()) {
-
             return commandResult;
         }
 
@@ -55,7 +54,7 @@ public class Script extends Command {
             }
             fileReader.close();
         } catch (FileNotFoundException e) {
-            commandResult.addToMessage("\u001B[31m" + this.name + " : Файл не найден" + "\u001B[0m");
+            commandResult.addToMessage("\u001B[31m" + this.name + " : Файл не найден. Попытались прочитать файл " + args[1] + " , но не вышло :(" + "\u001B[0m");
             return commandResult;
         }
         return commandResult;

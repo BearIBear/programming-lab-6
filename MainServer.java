@@ -154,7 +154,7 @@ public class MainServer {
                     if (reader.available() > 0) {
                         int codeCharacter = reader.read();
                         readCharacter = (char) codeCharacter;
-                        if (readCharacter == '\r' || readCharacter == '\n') {
+                        if (readCharacter == '\r' || readCharacter == '\n' || codeCharacter == 10 || codeCharacter == 13) {
                             System.out.println();
                             serverCommand = stringBuilder.toString().trim();
                             stringBuilder.setLength(0);
@@ -166,7 +166,7 @@ public class MainServer {
                                 log.info("Collection saved");
                                 commandsList.get("save").run(new String[1], null);
                             }
-                        } else if (codeCharacter == 8) {
+                        } else if (codeCharacter == 8 || codeCharacter == 127) {
                             System.out.print(readCharacter);
                             System.out.print(" ");
                             System.out.print(readCharacter);

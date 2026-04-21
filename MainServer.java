@@ -87,9 +87,7 @@ public class MainServer {
         try {
             Terminal terminal = TerminalBuilder.builder().system(true).build();
             NonBlockingReader reader = terminal.reader();
-            char[] commandString = new char[4];
             String serverCommand = "";
-            int currentPosition = 0;
             char readCharacter = 0;
     
             try {
@@ -106,6 +104,8 @@ public class MainServer {
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
                 log.info("Server active, waiting for requests...");
                 boolean working = true;
+
+                StringBuilder stringBuilder = new StringBuilder();
     
                 while (working) {
                     int selectionAmount = selector.selectNow();
@@ -152,12 +152,12 @@ public class MainServer {
                     }
 
                     if (reader.available() > 0) {
-                        readCharacter = (char) reader.read();
-                        commandString[currentPosition++ % 4] = readCharacter;
-                        System.out.print(readCharacter);
-                        if (currentPosition % 4 == 0) {
-                            System.out.println("");
-                            serverCommand = String.valueOf(commandString);
+                        int codeCharacter = reader.read();
+                        readCharacter = (char) codeCharacter;
+                        if (readCharacter == '\r' || readCharacter == '\n') {
+                            System.out.println();
+                            serverCommand = stringBuilder.toString().trim();
+                            stringBuilder.setLength(0);
                             if (serverCommand.equals("exit")) {
                                 log.info("You are absolutely right! We shouldn't just save the collection — we should shut down the server");
                                 commandsList.get("save").run(new String[1], null);
@@ -166,7 +166,23 @@ public class MainServer {
                                 log.info("Collection saved");
                                 commandsList.get("save").run(new String[1], null);
                             }
+                        } else if (codeCharacter == 8) {
+                            System.out.print(readCharacter);
+                            System.out.print(" ");
+                            System.out.print(readCharacter);
+                            stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
+                        } else {
+                            stringBuilder.append(readCharacter);
+                            System.out.print(readCharacter);
                         }
+                        
+                        // commandString[currentPosition++ % 4] = readCharacter;
+                        // System.out.print(readCharacter);
+                        // if (currentPosition % 4 == 0) {
+                        //     System.out.println("");
+                        //     serverCommand = String.valueOf(commandString);
+                            
+                        // }
                     }
                 }
 

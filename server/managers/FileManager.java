@@ -53,7 +53,6 @@ public class FileManager {
             return;
         }
 
-        // Инициализируем сканер так, чтобы его не надо было закрывать вручную
         try (Scanner fileScanner = new Scanner(file)) {
             StringBuilder jsonString = new StringBuilder();
             while (fileScanner.hasNextLine()) {

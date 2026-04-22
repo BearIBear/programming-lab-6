@@ -93,15 +93,15 @@ public class FileManager {
             }
         
         } catch (FileNotFoundException e) {
-            System.out.println("Файл не найден: " + e.getMessage());
+            log.error("File not found: " + e.getMessage());
         } catch (JsonSyntaxException e) {
-            System.out.println("Неправильный JSON");
+            log.error("Incorrect JSON format");
         }
     }
 
     public void save(CollectionManager collectionManager) {
         if (fileName == null || fileName.isEmpty()) {
-            System.out.println("Имя файла не указано, сохранения не будет");
+            log.warn("File name is empty, no collection will be saved");
             return;
         }
 
@@ -111,18 +111,18 @@ public class FileManager {
                 file.createNewFile();
             }
             if (!file.canWrite()) {
-                System.out.println("Ошибка: Нет прав на запись в файл " + fileName);
+                log.error("No permissions to write to file: " + fileName);
                 return;
             }
 
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 String json = gson.toJson(collectionManager.getCollection());
                 fos.write(json.getBytes());
-                System.out.println("Коллекция успешно сохранена в файл: " + fileName);
+                log.info("Collection save successfully into: " + fileName);
             }
 
         } catch (IOException e) {
-            System.out.println("Ошибка при сохранении файла: " + e.getMessage());
+            log.error("Error while saving file: " + e.getMessage());
         }
     }
 

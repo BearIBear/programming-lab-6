@@ -62,7 +62,7 @@ class MainClient {
                 System.out.println("Клиент запущен, пытаемся передать UUID");
                 Packet sendPacket = new Packet(clientUUID, 1, 0, null);
                 byte[] serializedPacket = SerializationUtils.serialize(sendPacket);
-                DatagramPacket sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 3553);
+                DatagramPacket sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 37582);
                 clientSocket.send(sendDatagramPacket);
                 System.out.println("UUID отправлен успешно");
 
@@ -201,7 +201,7 @@ class MainClient {
                         }
 
                         packets = (ArrayList<Packet>) Packet.packObject(clientUUID, commandPayload);
-                        Packet.clientSendPackets(clientSocket, packets, serverAddr, 3553);
+                        Packet.clientSendPackets(clientSocket, packets, serverAddr, 37582);
 
                         receiveBuffer = new byte[1024];
                         receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
@@ -220,7 +220,7 @@ class MainClient {
                     } else if (tokens[0].isBlank()) {} else if (tokens[0].equals("exit")) {
                         sendPacket = new Packet(clientUUID, 1, 0, null);
                         serializedPacket = SerializationUtils.serialize(sendPacket); 
-                        sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 3553);
+                        sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 37582);
                         clientSocket.send(sendDatagramPacket);
                         break;
                     } else {

@@ -98,7 +98,7 @@ public class MainServer {
                     // server.bind(new InetSocketAddress(InetAddress.getByName("helios"), 3553));
                 // } catch (Exception e) {
                     // log.error("Helios server creation failed, localhost one has been activated instead");
-                    server.bind(new InetSocketAddress(3553));
+                    server.bind(new InetSocketAddress(37582));
                 // }
                 server.configureBlocking(false);
                 server.register(selector, SelectionKey.OP_READ);

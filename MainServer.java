@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -95,12 +94,12 @@ public class MainServer {
             try {
                 Selector selector = Selector.open();
                 DatagramChannel server = DatagramChannel.open();
-                try {
-                    server.bind(new InetSocketAddress(InetAddress.getByName("helios"), 3553));
-                } catch (UnknownHostException e) {
-                    log.error("Helios server creation failed, localhost one has been activated instead");
+                // try {
+                    // server.bind(new InetSocketAddress(InetAddress.getByName("helios"), 3553));
+                // } catch (Exception e) {
+                    // log.error("Helios server creation failed, localhost one has been activated instead");
                     server.bind(new InetSocketAddress(3553));
-                }
+                // }
                 server.configureBlocking(false);
                 server.register(selector, SelectionKey.OP_READ);
                 ByteBuffer buffer = ByteBuffer.allocate(1024);

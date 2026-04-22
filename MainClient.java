@@ -45,7 +45,8 @@ class MainClient {
             Terminal terminal = TerminalBuilder.builder().system(true).build();
             History history = new DefaultHistory();
             UUID clientUUID = null;
-            while (true) {
+            boolean works = true;
+            while (works) {
                 if (clientUUID != null) {
                     System.out.println("Соединение было потеряно. Переподключаемся...");
                 }
@@ -224,6 +225,7 @@ class MainClient {
                                 CommandResult result = (CommandResult) Packet.restoreObject(packets);
                                 terminal.writer().println(result.getMessage());
                             } else if (tokens[0].isBlank()) {} else if (tokens[0].equals("exit")) {
+                                works = false;
                                 sendPacket = new Packet(clientUUID, 1, 0, null);
                                 serializedPacket = SerializationUtils.serialize(sendPacket); 
                                 sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 37582);

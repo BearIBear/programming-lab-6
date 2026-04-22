@@ -41,201 +41,202 @@ import org.apache.commons.lang3.SerializationUtils;
  */
 class MainClient {
     public static void main(String[] args) {
-        UUID clientUUID = UUID.randomUUID();
-        System.out.println("UUID Клиента: " + clientUUID);
-        try (DatagramSocket clientSocket = new DatagramSocket()) {
-            try {
-
-                InetAddress serverAddr;
+        while (true) {
+            UUID clientUUID = UUID.randomUUID();
+            System.out.println("UUID Клиента: " + clientUUID);
+            try (DatagramSocket clientSocket = new DatagramSocket()) {
                 try {
-                    serverAddr = InetAddress.getByName("helios");
-                } catch (Exception e) {
-                    System.out.println("Создание клиента на helios провалилась, делаем на localhost...");
-                    serverAddr = InetAddress.getLocalHost();
-                }
-                clientSocket.setSoTimeout(5000);
-                Terminal terminal = TerminalBuilder.builder().system(true).build();
-                History history = new DefaultHistory();
-
-                ConsoleManager consoleManager = new ConsoleManager(terminal);
-
-                System.out.println("Клиент запущен, пытаемся передать UUID");
-                Packet sendPacket = new Packet(clientUUID, 1, 0, null);
-                byte[] serializedPacket = SerializationUtils.serialize(sendPacket);
-                DatagramPacket sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 37582);
-                clientSocket.send(sendDatagramPacket);
-                System.out.println("UUID отправлен успешно");
-
-                byte[] receiveBuffer = new byte[1024];
-                DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                
-                for (int i = 0;; i++) {
+                    InetAddress serverAddr;
                     try {
-                        if (i > 0) {
-                            System.out.println("Попытка переподключения: " + i);
-                            clientSocket.send(sendDatagramPacket);
-                        }
-                        clientSocket.receive(receivePacket);
-                        break;
-                    } catch (SocketTimeoutException e) {
-                        System.out.println("Получение команд провалилось...");
+                        serverAddr = InetAddress.getByName("helios");
+                    } catch (Exception e) {
+                        System.out.println("Создание клиента на helios провалилась, делаем на localhost...");
+                        serverAddr = InetAddress.getLocalHost();
                     }
-                }
-
-                ArrayList<Packet> packets = new ArrayList<>();
-                Packet receivedPacket = SerializationUtils.deserialize(receiveBuffer);
-                packets.add(receivedPacket);
-                for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
-                    clientSocket.receive(receivePacket);
-                    receivedPacket = SerializationUtils.deserialize(receiveBuffer);
-                    packets.add(receivedPacket);
-                }
-                String[] commandNames = (String[]) Packet.restoreObject(packets);
-                commandNames = Arrays.stream(commandNames).filter(Predicate.not(name -> name.equals("save"))).toArray(String[]::new);
-                System.out.println("Имена команд получены успешно");
-
-                String commands = "\\b(" + String.join("|", commandNames) + "|" + "exit" + ")\\b";
-                final Pattern commandsPattern = Pattern.compile(commands, Pattern.CASE_INSENSITIVE);
-                List<String> commandNamesList = Arrays.stream(commandNames).toList();
-
-                receiveBuffer = new byte[1024];
-                receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
-                clientSocket.receive(receivePacket);
-
-                packets = new ArrayList<>();
-                receivedPacket = SerializationUtils.deserialize(receiveBuffer);
-                packets.add(receivedPacket);
-                for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
-                    clientSocket.receive(receivePacket);
-                    receivedPacket = SerializationUtils.deserialize(receiveBuffer);
-                    packets.add(receivedPacket);
-                }
-                String[] filesRaw = (String[]) Packet.restoreObject(packets);
-                System.out.println("Имена файлов получены успешно");
-
-                String files = String.join("|", filesRaw);
-                files = files.replace(".", "\\.");
-                files = files.replace("(", "\\(");
-                files = files.replace(")", "\\)");
-                files = "\\b(" + files + ")\\b";
-                final Pattern filesPattern = Pattern.compile(files);
-
-                Highlighter consoleHighlighter = new Highlighter() {
-                    @Override
-                    public AttributedString highlight(LineReader reader, String buffer) {
-                        AttributedStringBuilder builder = new AttributedStringBuilder();
-                        if (buffer.length() <= 1) {
-                            return builder.append(buffer).toAttributedString();
-                        }
-
-                        Matcher matcherCommand = commandsPattern.matcher(buffer);
-                        Matcher matcherFiles = filesPattern.matcher(buffer);
-
-                        boolean resultCommand = matcherCommand.find();
-                        boolean resultFile = matcherFiles.find();
-
-                        if (!resultCommand && !resultFile) {
-                            builder.append(buffer);
-                            return builder.toAttributedString();
-                        }
-
-                        if (resultCommand) {
-                            builder.append(buffer.substring(0, matcherCommand.start()));
-                            builder.styled(
-                                    AttributedStyle.BOLD.foreground(AttributedStyle.BLUE),
-                                    buffer.substring(matcherCommand.start(), matcherCommand.end()));
-
-                            if (!resultFile) {
-                                builder.append(buffer.substring(matcherCommand.end()));
-                                return builder.toAttributedString();
+                    clientSocket.setSoTimeout(5000);
+                    Terminal terminal = TerminalBuilder.builder().system(true).build();
+                    History history = new DefaultHistory();
+    
+                    ConsoleManager consoleManager = new ConsoleManager(terminal);
+    
+                    System.out.println("Клиент запущен, пытаемся передать UUID");
+                    Packet sendPacket = new Packet(clientUUID, 1, 0, null);
+                    byte[] serializedPacket = SerializationUtils.serialize(sendPacket);
+                    DatagramPacket sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 37582);
+                    clientSocket.send(sendDatagramPacket);
+                    System.out.println("UUID отправлен успешно");
+    
+                    byte[] receiveBuffer = new byte[1024];
+                    DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                    
+                    for (int i = 0;; i++) {
+                        try {
+                            if (i > 0) {
+                                System.out.println("Попытка переподключения: " + i);
+                                clientSocket.send(sendDatagramPacket);
                             }
+                            clientSocket.receive(receivePacket);
+                            break;
+                        } catch (SocketTimeoutException e) {
+                            System.out.println("Получение команд провалилось...");
                         }
-
-                        if (resultFile) {
-                            int previousEnd;
-                            if (!resultCommand) {
-                                previousEnd = 0; 
-                            } else {
-                                previousEnd = matcherCommand.end();
-                            }
-
-                            if (previousEnd > matcherFiles.start()) {
-                                try {
-                                    matcherFiles.find();
-                                    builder.append(buffer.substring(previousEnd, matcherFiles.start()));
-                                } catch (IllegalStateException e) {
-                                    return builder.append(buffer.substring(previousEnd)).toAttributedString();
-                                }
-                            } else {
-                                builder.append(buffer.substring(previousEnd, matcherFiles.start()));
-                            }
-
-                            builder.styled(
-                                    AttributedStyle.BOLD.foreground(AttributedStyle.YELLOW),
-                                    buffer.substring(matcherFiles.start(), matcherFiles.end()));
-                            builder.append(buffer.substring(matcherFiles.end())); 
-                        }
-                        return builder.toAttributedString();
                     }
-                };
-                
-                AggregateCompleter dynamicCompleter = new AggregateCompleter(new StringsCompleter(commandNames), new FileNameCompleter());
-                LineReader reader = LineReaderBuilder.builder()
-                        .terminal(terminal)
-                        .completer(dynamicCompleter)
-                        .history(history)
-                        .variable(LineReader.HISTORY_FILE, Paths.get("history.txt"))
-                        .highlighter(consoleHighlighter)
-                        .build();
-                consoleManager.setReader(reader);
-
-                while (true) {
-                    String input = reader.readLine("> ");
-                    String[] tokens = input.strip().split(" ");
-                    String commandName = tokens[0];
-                    if (commandNamesList.contains(commandName)) {
-                        CommandPayload commandPayload = new CommandPayload(commandName, tokens, null);
-
-                        if (commandName.contains("add") || commandName.contains("update")) {
-                            commandPayload.setBand(consoleManager.askMusicBand());
-                        }
-
-                        packets = (ArrayList<Packet>) Packet.packObject(clientUUID, commandPayload);
-                        Packet.clientSendPackets(clientSocket, packets, serverAddr, 37582);
-
-                        receiveBuffer = new byte[1024];
-                        receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+    
+                    ArrayList<Packet> packets = new ArrayList<>();
+                    Packet receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                    packets.add(receivedPacket);
+                    for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
                         clientSocket.receive(receivePacket);
-
-                        packets = new ArrayList<>();
                         receivedPacket = SerializationUtils.deserialize(receiveBuffer);
                         packets.add(receivedPacket);
-                        for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
+                    }
+                    String[] commandNames = (String[]) Packet.restoreObject(packets);
+                    commandNames = Arrays.stream(commandNames).filter(Predicate.not(name -> name.equals("save"))).toArray(String[]::new);
+                    System.out.println("Имена команд получены успешно");
+    
+                    String commands = "\\b(" + String.join("|", commandNames) + "|" + "exit" + ")\\b";
+                    final Pattern commandsPattern = Pattern.compile(commands, Pattern.CASE_INSENSITIVE);
+                    List<String> commandNamesList = Arrays.stream(commandNames).toList();
+    
+                    receiveBuffer = new byte[1024];
+                    receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
+                    clientSocket.receive(receivePacket);
+    
+                    packets = new ArrayList<>();
+                    receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                    packets.add(receivedPacket);
+                    for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
+                        clientSocket.receive(receivePacket);
+                        receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                        packets.add(receivedPacket);
+                    }
+                    String[] filesRaw = (String[]) Packet.restoreObject(packets);
+                    System.out.println("Имена файлов получены успешно");
+    
+                    String files = String.join("|", filesRaw);
+                    files = files.replace(".", "\\.");
+                    files = files.replace("(", "\\(");
+                    files = files.replace(")", "\\)");
+                    files = "\\b(" + files + ")\\b";
+                    final Pattern filesPattern = Pattern.compile(files);
+    
+                    Highlighter consoleHighlighter = new Highlighter() {
+                        @Override
+                        public AttributedString highlight(LineReader reader, String buffer) {
+                            AttributedStringBuilder builder = new AttributedStringBuilder();
+                            if (buffer.length() <= 1) {
+                                return builder.append(buffer).toAttributedString();
+                            }
+    
+                            Matcher matcherCommand = commandsPattern.matcher(buffer);
+                            Matcher matcherFiles = filesPattern.matcher(buffer);
+    
+                            boolean resultCommand = matcherCommand.find();
+                            boolean resultFile = matcherFiles.find();
+    
+                            if (!resultCommand && !resultFile) {
+                                builder.append(buffer);
+                                return builder.toAttributedString();
+                            }
+    
+                            if (resultCommand) {
+                                builder.append(buffer.substring(0, matcherCommand.start()));
+                                builder.styled(
+                                        AttributedStyle.BOLD.foreground(AttributedStyle.BLUE),
+                                        buffer.substring(matcherCommand.start(), matcherCommand.end()));
+    
+                                if (!resultFile) {
+                                    builder.append(buffer.substring(matcherCommand.end()));
+                                    return builder.toAttributedString();
+                                }
+                            }
+    
+                            if (resultFile) {
+                                int previousEnd;
+                                if (!resultCommand) {
+                                    previousEnd = 0; 
+                                } else {
+                                    previousEnd = matcherCommand.end();
+                                }
+    
+                                if (previousEnd > matcherFiles.start()) {
+                                    try {
+                                        matcherFiles.find();
+                                        builder.append(buffer.substring(previousEnd, matcherFiles.start()));
+                                    } catch (IllegalStateException e) {
+                                        return builder.append(buffer.substring(previousEnd)).toAttributedString();
+                                    }
+                                } else {
+                                    builder.append(buffer.substring(previousEnd, matcherFiles.start()));
+                                }
+    
+                                builder.styled(
+                                        AttributedStyle.BOLD.foreground(AttributedStyle.YELLOW),
+                                        buffer.substring(matcherFiles.start(), matcherFiles.end()));
+                                builder.append(buffer.substring(matcherFiles.end())); 
+                            }
+                            return builder.toAttributedString();
+                        }
+                    };
+                    
+                    AggregateCompleter dynamicCompleter = new AggregateCompleter(new StringsCompleter(commandNames), new FileNameCompleter());
+                    LineReader reader = LineReaderBuilder.builder()
+                            .terminal(terminal)
+                            .completer(dynamicCompleter)
+                            .history(history)
+                            .variable(LineReader.HISTORY_FILE, Paths.get("history.txt"))
+                            .highlighter(consoleHighlighter)
+                            .build();
+                    consoleManager.setReader(reader);
+    
+                    while (true) {
+                        String input = reader.readLine("> ");
+                        String[] tokens = input.strip().split(" ");
+                        String commandName = tokens[0];
+                        if (commandNamesList.contains(commandName)) {
+                            CommandPayload commandPayload = new CommandPayload(commandName, tokens, null);
+    
+                            if (commandName.contains("add") || commandName.contains("update")) {
+                                commandPayload.setBand(consoleManager.askMusicBand());
+                            }
+    
+                            packets = (ArrayList<Packet>) Packet.packObject(clientUUID, commandPayload);
+                            Packet.clientSendPackets(clientSocket, packets, serverAddr, 37582);
+    
+                            receiveBuffer = new byte[1024];
+                            receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                             clientSocket.receive(receivePacket);
+    
+                            packets = new ArrayList<>();
                             receivedPacket = SerializationUtils.deserialize(receiveBuffer);
                             packets.add(receivedPacket);
+                            for (byte i = 1; i < receivedPacket.getPacketsAmount(); i++) {
+                                clientSocket.receive(receivePacket);
+                                receivedPacket = SerializationUtils.deserialize(receiveBuffer);
+                                packets.add(receivedPacket);
+                            }
+                            CommandResult result = (CommandResult) Packet.restoreObject(packets);
+                            terminal.writer().println(result.getMessage());
+                        } else if (tokens[0].isBlank()) {} else if (tokens[0].equals("exit")) {
+                            sendPacket = new Packet(clientUUID, 1, 0, null);
+                            serializedPacket = SerializationUtils.serialize(sendPacket); 
+                            sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 37582);
+                            clientSocket.send(sendDatagramPacket);
+                            break;
+                        } else {
+                            System.out.println("\u001B[31m" + input + " не распознано как имя команды. Введите help для справки." + "\u001B[0m");
                         }
-                        CommandResult result = (CommandResult) Packet.restoreObject(packets);
-                        terminal.writer().println(result.getMessage());
-                    } else if (tokens[0].isBlank()) {} else if (tokens[0].equals("exit")) {
-                        sendPacket = new Packet(clientUUID, 1, 0, null);
-                        serializedPacket = SerializationUtils.serialize(sendPacket); 
-                        sendDatagramPacket = new DatagramPacket(serializedPacket, 1024, serverAddr, 37582);
-                        clientSocket.send(sendDatagramPacket);
-                        break;
+                    }
+                } catch (IOException e) {
+                    if (e instanceof SocketTimeoutException) {
+                        System.err.println("Соединение потеряно: " + e.getMessage());
                     } else {
-                        System.out.println("\u001B[31m" + input + " не распознано как имя команды. Введите help для справки." + "\u001B[0m");
+                        System.err.println("Не удалось создать терминал: " + e.getMessage());
                     }
                 }
-            } catch (IOException e) {
-                if (e instanceof SocketTimeoutException) {
-                    System.err.println("Соединение потеряно: " + e.getMessage());
-                } else {
-                    System.err.println("Не удалось создать терминал: " + e.getMessage());
-                }
+            } catch (SocketException e) {
+                e.printStackTrace();
             }
-        } catch (SocketException e) {
-            e.printStackTrace();
         }
     }
 }

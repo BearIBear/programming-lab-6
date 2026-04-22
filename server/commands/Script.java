@@ -42,6 +42,7 @@ public class Script extends Command {
                     }
                     commandManager.setRecursionForcedExit(true);
                     fileReader.close();
+                    System.out.println("Анти-рекурсия сработала");
                     return commandResult;
                 }
 

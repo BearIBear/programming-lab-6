@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -94,12 +93,7 @@ public class MainServer {
             try {
                 Selector selector = Selector.open();
                 DatagramChannel server = DatagramChannel.open();
-                // try {
-                    // server.bind(new InetSocketAddress(InetAddress.getByName("helios"), 3553));
-                // } catch (Exception e) {
-                    // log.error("Helios server creation failed, localhost one has been activated instead");
-                    server.bind(new InetSocketAddress(37582));
-                // }
+                server.bind(new InetSocketAddress(37582));
                 server.configureBlocking(false);
                 server.register(selector, SelectionKey.OP_READ);
                 ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -144,6 +138,7 @@ public class MainServer {
                                 CommandPayload commandPayload = (CommandPayload) Packet.restoreObject(packets);
                                 CommandResult result = commandsList.get(commandPayload.getCommandName()).run(commandPayload.getArgs(), commandPayload.getBand());
                                 commandManager.clearScriptFiles();
+                                commandManager.setRecursionForcedExit(false);
                                 ArrayList<Packet> packetsToSend = (ArrayList<Packet>) Packet.packObject(receivedUUID, result);
                                 Packet.serverSendPackets(server, packetsToSend, clientAddress);
                                 userPackets.put(receivedUUID, new ArrayList<>());
@@ -176,14 +171,6 @@ public class MainServer {
                             stringBuilder.append(readCharacter);
                             System.out.print(readCharacter);
                         }
-                        
-                        // commandString[currentPosition++ % 4] = readCharacter;
-                        // System.out.print(readCharacter);
-                        // if (currentPosition % 4 == 0) {
-                        //     System.out.println("");
-                        //     serverCommand = String.valueOf(commandString);
-                            
-                        // }
                     }
                 }
 

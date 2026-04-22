@@ -31,7 +31,9 @@ public class Help extends Command {
             max_length = Math.max(max_length, name.length());
         }
         for (String name : commandsList.keySet()) {
-            commandResult.addToMessage(name + " ".repeat(max_length + padding - name.length()) + commandsList.get(name).getDesc());
+            if (!name.equals("save")) {
+                commandResult.addToMessage(name + " ".repeat(max_length + padding - name.length()) + commandsList.get(name).getDesc());
+            }
         }
         commandResult.setContinueFlag(true);
         return commandResult;

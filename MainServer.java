@@ -136,9 +136,14 @@ public class MainServer {
         
                             if (packets.size() == receivedPacket.getPacketsAmount()) {
                                 CommandPayload commandPayload = (CommandPayload) Packet.restoreObject(packets);
-                                CommandResult result = commandsList.get(commandPayload.getCommandName()).run(commandPayload.getArgs(), commandPayload.getBand());
-                                commandManager.clearScriptFiles();
-                                commandManager.setRecursionForcedExit(false);
+                                CommandResult result;
+                                if (!commandPayload.getCommandName().equals("save")) {
+                                    result = commandsList.get(commandPayload.getCommandName()).run(commandPayload.getArgs(), commandPayload.getBand());
+                                    commandManager.clearScriptFiles();
+                                    commandManager.setRecursionForcedExit(false);
+                                } else {
+                                    result = new CommandResult(true, "Ты чё");
+                                }
                                 ArrayList<Packet> packetsToSend = (ArrayList<Packet>) Packet.packObject(receivedUUID, result);
                                 Packet.serverSendPackets(server, packetsToSend, clientAddress);
                                 userPackets.put(receivedUUID, new ArrayList<>());

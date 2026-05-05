@@ -19,7 +19,6 @@ public class Info extends Command {
     public CommandResult run(String[] args, MusicBand band) {
         CommandResult commandResult = checkArgAmount(args);
         if (!commandResult.isContinueFlag()) {
-
             return commandResult;
         }
         commandResult.addToMessage("Тип коллекции: PriorityQueue");

@@ -83,7 +83,7 @@ public class MainServer {
         String[] commandNames = commandsList.keySet().toArray(String[]::new);
 
         try {
-            Terminal terminal = TerminalBuilder.builder().system(true).build();
+            Terminal terminal = TerminalBuilder.builder().system(true).nativeSignals(true).signalHandler(Terminal.SignalHandler.SIG_IGN).build();
             terminal.enterRawMode();
             NonBlockingReader reader = terminal.reader();
             
@@ -155,11 +155,12 @@ public class MainServer {
                     int codeCharacter = reader.read(10L);
                     if (codeCharacter >= 0) {
                         readCharacter = (char) codeCharacter;
-                        if (readCharacter == '\r' || readCharacter == '\n' || codeCharacter == 10 || codeCharacter == 13) {
+                        System.out.println(codeCharacter);
+                        if (readCharacter == '\r' || readCharacter == '\n' || codeCharacter == 10 || codeCharacter == 13 || codeCharacter == 3) {
                             System.out.print("\r\n");
                             serverCommand = stringBuilder.toString().trim();
                             stringBuilder.setLength(0);
-                            if (serverCommand.equals("exit")) {
+                            if (serverCommand.equals("exit") || codeCharacter == 3) {
                                 log.info("You are absolutely right! We shouldn't just save the collection — we should shut down the server");
                                 commandsList.get("save").run(new String[1], null);
                                 working = false;

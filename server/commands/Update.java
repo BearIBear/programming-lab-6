@@ -1,8 +1,5 @@
 package server.commands;
 
-import java.util.PriorityQueue;
-
-
 import models.MusicBand;
 import server.managers.CollectionManager;
 import util.CommandResult;
@@ -22,19 +19,16 @@ public class Update extends Command {
         args = Command.RemoveEmptyElements(args);
         CommandResult commandResult = checkArgAmount(args);
         if (!commandResult.isContinueFlag()) {
-
             return commandResult;
         }
+
         int id = Integer.parseInt(args[1]); 
-        PriorityQueue<MusicBand> musicBands = collectionManager.getCollection();
-        for (MusicBand musicBand : musicBands) {
-            if (musicBand.getId() == id) {
-                collectionManager.removeElement(id);
-                band.setId(id);
-                collectionManager.addElement(band);
-                return commandResult;
-            }
+        if (collectionManager.removeElement(id)) {
+            band.setId(id);
+            collectionManager.addElement(band);
+            return commandResult;
         }
+
         commandResult.addToMessage("\u001B[31m" + this.name + " : Элемент с id = " + id + " не найден" + "\u001B[0m");
         return commandResult;
     }

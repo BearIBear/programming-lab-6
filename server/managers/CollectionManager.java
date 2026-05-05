@@ -41,13 +41,8 @@ public class CollectionManager {
     }
 
     public boolean removeElement(long id) {
-        for (MusicBand musicBand : collection) {
-            if (musicBand.getId() == id) {
-                collection.remove(musicBand);
-                return true;
-            }
-        }
-        return false;
+        MusicBand bandToRemove = collection.stream().filter(band -> band.getId() == id).toArray(MusicBand[]::new)[0];
+        return collection.remove(bandToRemove);
     }
 
     public static void setNextId(long nextId) {

@@ -24,17 +24,17 @@ public class Help extends Command {
             return commandResult;
         }
 
-        int max_length = 0;
         int padding = 5;
         Map<String, Command>  commandsList = commandManager.getCommandsList();
-        for (String name : commandsList.keySet()) {
-            max_length = Math.max(max_length, name.length());
-        }
-        for (String name : commandsList.keySet()) {
-            if (!name.equals("save")) {
-                commandResult.addToMessage(name + " ".repeat(max_length + padding - name.length()) + commandsList.get(name).getDesc());
-            }
-        }
+        int max_length = commandsList.keySet().stream().mapToInt(String::length).max().getAsInt();
+        commandsList.entrySet().stream().filter(commandName -> !commandName.getKey()
+            .equals("save"))
+            .forEach(command -> {
+                String name = command.getKey();
+                String desc = command.getValue().getDesc();
+                commandResult.addToMessage(name + " ".repeat(max_length + padding - name.length()) + desc);
+            });
+
         commandResult.setContinueFlag(true);
         return commandResult;
     }

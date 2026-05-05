@@ -1,7 +1,5 @@
 package server.commands;
 
-import java.util.PriorityQueue;
-
 
 import models.MusicBand;
 import server.managers.CollectionManager;
@@ -21,11 +19,10 @@ public class Show extends Command {
     public CommandResult run(String[] args, MusicBand band) {
         CommandResult commandResult = checkArgAmount(args);
         if (!commandResult.isContinueFlag()) {
-
             return commandResult;
         }
-        PriorityQueue<MusicBand> collection = collectionManager.getCollection();
-        for (MusicBand musicBand : collection) {
+
+        collectionManager.getCollection().stream().forEach(musicBand -> {
             commandResult.addToMessage("ID группы: " + musicBand.getId());
             commandResult.addToMessage("Название группы: " + musicBand.getName());
             commandResult.addToMessage("Описание группы: " + musicBand.getDescription());
@@ -35,7 +32,8 @@ public class Show extends Command {
             commandResult.addToMessage("Количество участников: " + musicBand.getNumberOfParticipants());
             commandResult.addToMessage("Количество синглов: " + musicBand.getSinglesCount());
             commandResult.addToMessage("Координаты: " + musicBand.getCoordinates());
-        }
+        });
+
         return commandResult;
     }
 }
